@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::core_types::{Rank, Suit};
 
 #[derive(Debug, Clone, Copy)]
