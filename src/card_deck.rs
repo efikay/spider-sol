@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+use core::fmt;
+
 use rand::prelude::*;
 
 use strum::IntoEnumIterator;
@@ -8,8 +10,14 @@ use crate::{
     data_structures::Stack,
 };
 
-struct CardDeck {
+pub struct CardDeck {
     remaining_cards: Stack<Card>,
+}
+
+impl fmt::Display for CardDeck {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.remaining_cards)
+    }
 }
 
 impl CardDeck {
@@ -35,6 +43,10 @@ impl CardDeck {
 
     pub fn len(&self) -> usize {
         self.remaining_cards.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     pub fn take_card(&mut self) -> Option<Card> {

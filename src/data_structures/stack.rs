@@ -1,8 +1,27 @@
 #![allow(dead_code)]
 
+use core::fmt;
+
 #[derive(Debug, Clone)]
 pub struct Stack<T> {
     elements: Vec<T>,
+}
+
+impl<T: fmt::Display> fmt::Display for Stack<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "┌─────── Stack ───────┐")?;
+
+        for (i, item) in self.elements.iter().rev().enumerate() {
+            if i == 0 {
+                write!(f, "│ → {:17} │", item)?; // Arrow for top element
+            } else {
+                write!(f, "│   {:17} │", item)?;
+            }
+            writeln!(f)?;
+        }
+
+        write!(f, "└─────────────────────┘")
+    }
 }
 
 impl<T> FromIterator<T> for Stack<T> {
