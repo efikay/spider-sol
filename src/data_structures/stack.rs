@@ -53,6 +53,18 @@ impl<T: std::clone::Clone> Stack<T> {
         self.elements.pop()
     }
 
+    pub fn pop_many(&mut self, desired_amount: usize) -> Vec<T> {
+        let amount = if self.elements.len() < desired_amount {
+            self.elements.len()
+        } else {
+            desired_amount
+        };
+
+        self.elements
+            .drain(self.elements.len() - amount..)
+            .collect()
+    }
+
     pub fn peek(&self) -> Option<&T> {
         self.elements.last()
     }

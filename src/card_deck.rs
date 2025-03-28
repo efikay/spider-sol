@@ -52,6 +52,10 @@ impl CardDeck {
     pub fn take_card(&mut self) -> Option<Card> {
         self.remaining_cards.pop()
     }
+
+    pub fn take_cards(&mut self, desired_amount: usize) -> Vec<Card> {
+        self.remaining_cards.pop_many(desired_amount)
+    }
 }
 
 fn shuffle_cards(cards: &mut Vec<Card>) {
