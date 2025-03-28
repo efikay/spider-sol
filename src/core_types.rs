@@ -23,6 +23,15 @@ impl Suit {
             Suit::Spades | Suit::Clubs => "Black",
         }
     }
+
+    pub fn symbol(&self) -> char {
+        match self {
+            Suit::Hearts => '♥',
+            Suit::Spades => '♠',
+            Suit::Clubs => '♣',
+            Suit::Diamonds => '♦',
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
