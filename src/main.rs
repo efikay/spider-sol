@@ -1,5 +1,5 @@
 mod core_types;
-mod stack;
+mod data_structures;
 
 mod card;
 mod card_sequence;

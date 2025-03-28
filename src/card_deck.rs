@@ -4,7 +4,9 @@ use rand::prelude::*;
 use strum::IntoEnumIterator;
 
 use crate::{
-    card::Card, core_types::{GameMode, Suit}, stack::Stack
+    card::Card,
+    core_types::{GameMode, Suit},
+    data_structures::Stack,
 };
 
 struct CardDeck {

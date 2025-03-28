@@ -1,19 +1,19 @@
 #![allow(dead_code)]
 
-use crate::{card::Card, stack::Stack};
+use crate::{card::Card, data_structures::Stack};
 
 pub struct CardPile {
-  cards: Stack<Card>,
+    cards: Stack<Card>,
 }
 
 impl CardPile {
-  pub fn new() -> Self {
-    Self {
-      cards: Stack::new(),
+    pub fn new() -> Self {
+        Self {
+            cards: Stack::new(),
+        }
     }
-  }
 
-  pub fn add_card(&mut self, card: Card) {
-    self.cards.push(card);
-  }
+    pub fn add_card(&mut self, card: Card) {
+        self.cards.push(card);
+    }
 }
