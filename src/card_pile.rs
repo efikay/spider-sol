@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::{card::Card, data_structures::Stack};
+use crate::{core::Card, data_structures::Stack};
 
 pub struct CardPile {
     cards: Stack<Card>,

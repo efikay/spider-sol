@@ -1,7 +1,6 @@
-mod core_types;
+mod core;
 mod data_structures;
 
-mod card;
 mod card_sequence;
 mod card_pile;
 mod game_tableau;

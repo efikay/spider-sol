@@ -2,7 +2,7 @@
 
 use strum::IntoEnumIterator;
 
-use crate::core_types::{Rank, Suit};
+use super::{Rank, Suit};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Card {

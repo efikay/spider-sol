@@ -1,12 +1,11 @@
 #![allow(dead_code)]
 
 /** Note about this module.
- * 
+ *
  * Debatable. Maybe I'll refuse to use this in future.
  * Looks-like overhead maybe.
  */
-
-use crate::{card::Card, core_types::Suit};
+use crate::{core::Card, core::Suit};
 
 #[derive(Debug, Clone)]
 pub struct CardSequence {
@@ -46,7 +45,7 @@ fn is_valid_order(cards: &Vec<Card>) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use crate::core_types::Rank;
+    use crate::core::Rank;
 
     use super::*;
 
