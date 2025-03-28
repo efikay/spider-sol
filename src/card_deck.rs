@@ -49,6 +49,10 @@ impl CardDeck {
         self.len() == 0
     }
 
+    pub fn is_fresh(&self) -> bool {
+        self.len() == 104 // Exact amount of cards for the traditional spooder game
+    }
+
     pub fn take_card(&mut self) -> Option<Card> {
         self.remaining_cards.pop()
     }
