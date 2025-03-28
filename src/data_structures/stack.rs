@@ -4,14 +4,14 @@ use core::fmt;
 
 #[derive(Debug, Clone)]
 pub struct Stack<T> {
-    elements: Vec<T>,
+    items: Vec<T>,
 }
 
 impl<T: fmt::Display> fmt::Display for Stack<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "┌─────── Stack ───────┐")?;
 
-        for (i, item) in self.elements.iter().rev().enumerate() {
+        for (i, item) in self.items.iter().rev().enumerate() {
             if i == 0 {
                 write!(f, "│ → {:17} │", item)?; // Arrow for top element
             } else {
@@ -27,11 +27,11 @@ impl<T: fmt::Display> fmt::Display for Stack<T> {
 impl<T> FromIterator<T> for Stack<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
         let mut c = Stack {
-            elements: Vec::new(),
+            items: Vec::new(),
         };
 
         for item in iter {
-            c.elements.push(item);
+            c.items.push(item);
         }
 
         c
@@ -41,43 +41,43 @@ impl<T> FromIterator<T> for Stack<T> {
 impl<T: std::clone::Clone> Stack<T> {
     pub fn new() -> Self {
         Stack {
-            elements: Vec::new(),
+            items: Vec::new(),
         }
     }
 
     pub fn push(&mut self, item: T) {
-        self.elements.push(item);
+        self.items.push(item);
     }
 
     pub fn pop(&mut self) -> Option<T> {
-        self.elements.pop()
+        self.items.pop()
     }
 
     pub fn pop_many(&mut self, desired_amount: usize) -> Vec<T> {
-        let amount = if self.elements.len() < desired_amount {
-            self.elements.len()
+        let amount = if self.items.len() < desired_amount {
+            self.items.len()
         } else {
             desired_amount
         };
 
-        self.elements
-            .drain(self.elements.len() - amount..)
+        self.items
+            .drain(self.items.len() - amount..)
             .collect()
     }
 
     pub fn peek(&self) -> Option<&T> {
-        self.elements.last()
+        self.items.last()
     }
 
     pub fn len(&self) -> usize {
-        self.elements.len()
+        self.items.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.elements.is_empty()
+        self.items.is_empty()
     }
 
     pub fn clear(&mut self) {
-        self.elements.clear()
+        self.items.clear()
     }
 }
