@@ -8,8 +8,8 @@
 
 use crate::{card::Card, core_types::Suit};
 
-#[derive(Debug)]
-struct CardSequence {
+#[derive(Debug, Clone)]
+pub struct CardSequence {
     pub cards: Vec<Card>,
 }
 
