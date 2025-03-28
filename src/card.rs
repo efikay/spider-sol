@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use strum::IntoEnumIterator;
+
 use crate::core_types::{Rank, Suit};
 
 #[derive(Debug, Clone, Copy)]
@@ -44,5 +46,9 @@ impl Card {
 
     pub fn can_stack_on(&self, other: &Card) -> bool {
         self.rank.value() == other.rank.value() - 1
+    }
+
+    pub fn make_full_sequence_of(suit: Suit) -> Vec<Card> {
+        Rank::iter().map(|r| Card::new_closed(r, suit)).collect()
     }
 }
