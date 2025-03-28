@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use strum_macros::EnumIter;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Suit {
     Spades,
@@ -34,7 +36,7 @@ impl Suit {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, EnumIter)]
 pub enum Rank {
     Ace = 1,
     Two,
@@ -54,4 +56,10 @@ impl Rank {
     pub fn value(self) -> u8 {
         self as u8
     }
+}
+
+pub enum GameMode {
+    OneSuit,
+    TwoSuits,
+    FourSuits,
 }
