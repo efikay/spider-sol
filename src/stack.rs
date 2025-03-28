@@ -1,4 +1,4 @@
-#!allow[dead_code]
+#![allow(dead_code)]
 
 #[derive(Debug, Clone)]
 pub struct Stack<T> {
