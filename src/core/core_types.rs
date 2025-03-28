@@ -56,6 +56,15 @@ impl Rank {
     pub fn value(self) -> u8 {
         self as u8
     }
+    pub fn to_human(self) -> String {
+        match self {
+            Rank::Ace => "A".to_owned(),
+            Rank::Jack => "J".to_owned(),
+            Rank::Queen => "Q".to_owned(),
+            Rank::King => "K".to_owned(),
+            number_rank => number_rank.value().to_string(),
+        }
+    }
 }
 
 pub enum GameMode {

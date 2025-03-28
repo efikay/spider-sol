@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use core::fmt;
+
 use strum::IntoEnumIterator;
 
 use super::{Rank, Suit};
@@ -9,6 +11,12 @@ pub struct Card {
     pub rank: Rank,
     pub suit: Suit,
     pub is_opened: bool, // false means "card back is shown, card cannot be played"
+}
+
+impl fmt::Display for Card {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "<{}{}>", self.rank.to_human(), self.suit.symbol())
+    }
 }
 
 impl Card {
