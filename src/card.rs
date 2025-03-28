@@ -42,10 +42,7 @@ impl Card {
         }
     }
 
-    pub fn can_stack_on(&self, other: Option<&Card>) -> bool {
-        match other {
-            None => true, // Can be placed on empty pile
-            Some(card) => self.rank.value() == card.rank.value() - 1,
-        }
+    pub fn can_stack_on(&self, other: &Card) -> bool {
+        self.rank.value() == other.rank.value() - 1
     }
 }
