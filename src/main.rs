@@ -1,4 +1,4 @@
-use debug_examples::console_debug_deck;
+use debug_examples::console_debug_game_start_and_deals;
 
 mod core;
 mod data_structures;
@@ -12,5 +12,5 @@ mod game;
 mod game_tableau;
 
 fn main() {
-    console_debug_deck();
+    console_debug_game_start_and_deals();
 }
