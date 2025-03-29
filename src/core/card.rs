@@ -44,8 +44,9 @@ impl Card {
         }
     }
 
+    // Stacking within same sequence. Different suits stacks as card sequences
     pub fn can_stack_on(&self, other: &Card) -> bool {
-        self.rank.value() == other.rank.value() - 1
+        self.rank.value() == other.rank.value() - 1 && self.suit == other.suit
     }
 
     pub fn make_full_sequence_of(suit: Suit) -> Vec<Card> {
