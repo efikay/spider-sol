@@ -7,6 +7,7 @@ mod data_structures;
 
 mod card_deck;
 mod card_pile;
+mod card_stock;
 mod card_sequence;
 mod game_tableau;
 
