@@ -2,7 +2,9 @@
 
 use core::fmt;
 
-use crate::{card_pile::CardPile, card_stock::InitialCards, core::Card};
+use crate::{
+    card_pile::CardPile, card_sequence::CardSequence, card_stock::InitialCards, core::Card,
+};
 
 const PILES_AMOUNT: usize = 10;
 
@@ -36,6 +38,15 @@ impl GameTableau {
             .for_each(|(pile, card)| {
                 pile.add_deal_card(*card);
             });
+    }
+
+    pub fn try_give_complete_sequence(&mut self) -> Option<CardSequence> {
+        for pile in &mut self.piles {
+            if let Some(complete_seq) = pile.try_give_complete_sequence() {
+                return Some(complete_seq);
+            }
+        }
+        None
     }
 
     fn init_piles(cards: &mut InitialCards) -> [CardPile; PILES_AMOUNT] {
