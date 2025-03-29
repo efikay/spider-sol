@@ -3,17 +3,17 @@
 use core::fmt;
 
 use crate::{
-    available_move::AvailableMove, card_deck::CardDeck, card_sequence::CardSequence,
-    card_stock::CardStock, game_tableau::GameTableau,
+    available_move::AvailableMove, card_sequence::CardSequence, card_stock_trait::ICardStock,
+    game_tableau::GameTableau,
 };
 
-pub struct Game {
+pub struct Game<CardStockT: ICardStock> {
     tableau: GameTableau,
-    stock: CardStock,
+    stock: CardStockT,
     complete_sequences: Vec<CardSequence>,
 }
 
-impl fmt::Display for Game {
+impl<CardStockT: ICardStock + std::fmt::Display> fmt::Display for Game<CardStockT> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "<Game>")?;
         writeln!(f, "{}", self.stock)?;
@@ -27,9 +27,8 @@ impl fmt::Display for Game {
     }
 }
 
-impl Game {
-    pub fn new(deck: CardDeck) -> Self {
-        let mut stock = CardStock::new(deck);
+impl<CardStockT: ICardStock> Game<CardStockT> {
+    pub fn new(mut stock: CardStockT) -> Self {
         let tableau = GameTableau::new(stock.take_initial_cards());
 
         Self {

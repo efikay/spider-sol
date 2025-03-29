@@ -3,6 +3,7 @@
 use core::fmt;
 
 use crate::{
+    card_stock_trait::ICardStock,
     card_deck::CardDeck,
     core::{Card, PILES_AMOUNT},
 };
@@ -27,12 +28,14 @@ impl CardStock {
     pub fn new(deck: CardDeck) -> Self {
         Self { deck }
     }
+}
 
-    pub fn deals_left(&self) -> usize {
+impl ICardStock for CardStock {
+    fn deals_left(&self) -> usize {
         self.deck.len() / PILES_AMOUNT
     }
 
-    pub fn take_deal(&mut self) -> Option<Vec<Card>> {
+    fn take_deal(&mut self) -> Option<Vec<Card>> {
         if self.deals_left() > 0 {
             Some(self.deck.take_and_open_cards(PILES_AMOUNT))
         } else {
@@ -40,7 +43,7 @@ impl CardStock {
         }
     }
 
-    pub fn take_initial_cards(&mut self) -> InitialCards {
+    fn take_initial_cards(&mut self) -> InitialCards {
         if !self.deck.is_fresh() {
             panic!("We need fresh deck for initial cards allocation!")
         }
