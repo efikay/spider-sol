@@ -67,8 +67,18 @@ impl Rank {
     }
 }
 
+#[derive(PartialEq, Eq, Hash, Copy, Clone)]
 pub enum GameMode {
     OneSuit,
     TwoSuits,
     FourSuits,
+}
+impl GameMode {
+    pub fn to_str(&self) -> &'static str {
+        match self {
+            GameMode::OneSuit => "1 Suit",
+            GameMode::TwoSuits => "2 Suits",
+            GameMode::FourSuits => "4 Suits",
+        }
+    }
 }
