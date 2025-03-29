@@ -60,6 +60,15 @@ impl CardDeck {
     pub fn take_cards(&mut self, desired_amount: usize) -> Vec<Card> {
         self.remaining_cards.pop_many(desired_amount)
     }
+
+    pub fn take_and_open_cards(&mut self, desired_amount: usize) -> Vec<Card> {
+        let mut cards = self.take_cards(desired_amount);
+        for card in &mut cards {
+            card.is_opened = true;
+        }
+
+        cards
+    }
 }
 
 fn shuffle_cards(cards: &mut Vec<Card>) {
