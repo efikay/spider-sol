@@ -10,6 +10,7 @@ mod card_pile;
 mod card_stock;
 mod card_sequence;
 mod game_tableau;
+mod game;
 
 fn wait_for_cards() {
     println!("Press [ENTER] key to take some cards...");
