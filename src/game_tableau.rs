@@ -1,11 +1,25 @@
 #![allow(dead_code)]
 
-use crate::{card_pile::CardPile, card_stock::InitialCards};
+use core::fmt;
+
+use crate::{card_pile::CardPile, card_stock::InitialCards, core::Card};
 
 const PILES_AMOUNT: usize = 10;
 
 pub struct GameTableau {
     piles: [CardPile; PILES_AMOUNT],
+}
+
+impl fmt::Display for GameTableau {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        writeln!(f, "<GameTableau>")?;
+        writeln!(f, "Piles:")?;
+        for (i, pile) in self.piles.iter().enumerate() {
+            write!(f, "\t Pile {}:", i + 1)?;
+            writeln!(f, "{}", pile)?;
+        }
+        writeln!(f, "</>")
+    }
 }
 
 impl GameTableau {
@@ -15,16 +29,25 @@ impl GameTableau {
         Self { piles }
     }
 
+    pub fn take_deal(&mut self, cards: Vec<Card>) {
+        self.piles
+            .iter_mut()
+            .zip(cards.iter())
+            .for_each(|(pile, card)| {
+                pile.add_deal_card(*card);
+            });
+    }
+
     fn init_piles(cards: &mut InitialCards) -> [CardPile; PILES_AMOUNT] {
         let mut pile_cards: [CardPile; PILES_AMOUNT] = std::array::from_fn(|_| CardPile::new());
         let mut pile_index = 0;
 
         cards.face_down_cards.drain(..).for_each(|card| {
-            pile_cards[pile_index].add_deal_card(card);
+            pile_cards[pile_index].add_start_card(card);
             pile_index = (pile_index + 1) % PILES_AMOUNT;
         });
         cards.face_up_cards.drain(..).for_each(|card| {
-            pile_cards[pile_index].add_deal_card(card);
+            pile_cards[pile_index].add_start_card(card);
             pile_index = (pile_index + 1) % PILES_AMOUNT;
         });
 
