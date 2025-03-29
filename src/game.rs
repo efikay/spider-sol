@@ -19,6 +19,10 @@ impl fmt::Display for Game {
         writeln!(f, "{}", self.stock)?;
         writeln!(f, "{}", self.tableau)?;
         writeln!(f, "Deals left: {}", self.stock.deals_left())?;
+        writeln!(f, "Available moves:")?;
+        for available_move in self.get_available_moves() {
+            writeln!(f, "\t{}", available_move)?;
+        }
         writeln!(f, "</Game>")
     }
 }
