@@ -1,5 +1,13 @@
 TODOs (in order):
-1. [ ] Basic logic
+1. [ ] Basic logic:
+  - [x] Card deck
+  - [x] Card sequences
+  - [x] Card piles
+  - [x] Full sequences
+  - [x] Win condition
+  - [ ] Move cards between piles
+  - [ ] ...etc?
+  - [ ] (Advanced) Undo
 2. [ ] ChooseTUI library (one of):
   - https://github.com/ratatui/ratatui
   - https://github.com/gyscos/cursive
