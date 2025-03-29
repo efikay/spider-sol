@@ -7,5 +7,5 @@ mod card_stock;
 mod card_stock_trait;
 mod core;
 mod data_types;
-mod game;
+mod game_engine;
 mod game_tableau;

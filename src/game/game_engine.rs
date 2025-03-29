@@ -7,13 +7,13 @@ use crate::game::{
     game_tableau::GameTableau,
 };
 
-pub struct Game<CardStockT: ICardStock> {
+pub struct GameEngine<CardStockT: ICardStock> {
     tableau: GameTableau,
     stock: CardStockT,
     complete_sequences: Vec<CardSequence>,
 }
 
-impl<CardStockT: ICardStock + std::fmt::Display> fmt::Display for Game<CardStockT> {
+impl<CardStockT: ICardStock + std::fmt::Display> fmt::Display for GameEngine<CardStockT> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "<Game>")?;
         writeln!(f, "{}", self.stock)?;
@@ -27,7 +27,7 @@ impl<CardStockT: ICardStock + std::fmt::Display> fmt::Display for Game<CardStock
     }
 }
 
-impl<CardStockT: ICardStock> Game<CardStockT> {
+impl<CardStockT: ICardStock> GameEngine<CardStockT> {
     pub fn new(mut stock: CardStockT) -> Self {
         let tableau = GameTableau::new(stock.take_initial_cards());
 
