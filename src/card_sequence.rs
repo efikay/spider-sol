@@ -46,7 +46,7 @@ impl CardSequence {
     pub fn suit(&self) -> Suit {
         match self.cards.first() {
             Some(first_card) => first_card.suit,
-            None => panic!("Sequence have to contain at least one card!"),
+            None => panic!("Sequence has to contain at least one card!"),
         }
     }
 
