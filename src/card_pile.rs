@@ -17,7 +17,19 @@ impl CardPile {
         self.sequences.is_empty()
     }
 
+    pub fn add_start_card(&mut self, card: Card) {
+        self.add_card(card);
+    }
+
     pub fn add_deal_card(&mut self, card: Card) {
+        if self.sequences.is_empty() {
+            panic!("cannot add deal card on empty pile!");
+        }
+
+        self.add_card(card);
+    }
+
+    fn add_card(&mut self, card: Card) {
         match self.sequences.pop() {
             Some(mut last_seq) => {
                 let is_card_added = last_seq.add_card(card);
@@ -27,9 +39,7 @@ impl CardPile {
                     self.sequences.push(CardSequence::from_card(card))
                 }
             }
-            None => {
-                panic!("Cannot add deal card on empty pile!")
-            }
+            None => self.sequences.push(CardSequence::from_card(card)),
         }
     }
 
