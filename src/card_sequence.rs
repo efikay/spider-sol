@@ -5,7 +5,7 @@
  * Debatable. Maybe I'll refuse to use this in future.
  * Looks-like overhead maybe.
  */
-use crate::{core::Card, core::Suit};
+use crate::core::{Card, FULL_SEQUENCE_LENGTH, Suit};
 
 #[derive(Debug, Clone)]
 pub struct CardSequence {
@@ -37,6 +37,10 @@ impl CardSequence {
     }
     pub fn add_card(&mut self, card: Card) -> bool {
         self.add_cards(vec![card])
+    }
+
+    pub fn is_complete(&self) -> bool {
+        self.cards.len() == FULL_SEQUENCE_LENGTH
     }
 
     pub fn suit(&self) -> Suit {
