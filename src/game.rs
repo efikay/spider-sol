@@ -47,12 +47,9 @@ impl Game {
         }
     }
 
-    /// TODO: Theoretically there's a chance that there will be two or more complete sequences at once
-    /// For example(and only the case): After a deal there might become 2 or more "completes"
-    pub fn search_for_complete_sequence(&mut self) {
-        if let Some(complete_seq) = self.tableau.try_give_complete_sequence() {
-            self.complete_sequences.push(complete_seq);
-        }
+    pub fn search_and_update_complete_sequences(&mut self) {
+        self.complete_sequences
+            .extend(self.tableau.give_complete_sequences());
     }
 
     pub fn is_won(&self) -> bool {

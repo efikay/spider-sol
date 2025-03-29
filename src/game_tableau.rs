@@ -40,13 +40,16 @@ impl GameTableau {
             });
     }
 
-    pub fn try_give_complete_sequence(&mut self) -> Option<CardSequence> {
+    pub fn give_complete_sequences(&mut self) -> Vec<CardSequence> {
+        let mut complete_sequences = vec![];
+
         for pile in &mut self.piles {
             if let Some(complete_seq) = pile.try_give_complete_sequence() {
-                return Some(complete_seq);
+                complete_sequences.push(complete_seq);
             }
         }
-        None
+
+        complete_sequences
     }
 
     fn init_piles(cards: &mut InitialCards) -> [CardPile; PILES_AMOUNT] {
