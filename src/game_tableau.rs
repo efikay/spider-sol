@@ -40,11 +40,11 @@ impl GameTableau {
             });
     }
 
-    pub fn give_complete_sequences(&mut self) -> Vec<CardSequence> {
+    pub fn extract_complete_sequences(&mut self) -> Vec<CardSequence> {
         let mut complete_sequences = vec![];
 
         for pile in &mut self.piles {
-            if let Some(complete_seq) = pile.try_give_complete_sequence() {
+            if let Some(complete_seq) = pile.try_extract_complete_sequence() {
                 complete_sequences.push(complete_seq);
             }
         }

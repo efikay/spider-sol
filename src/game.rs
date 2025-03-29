@@ -49,7 +49,7 @@ impl Game {
 
     pub fn search_and_update_complete_sequences(&mut self) {
         self.complete_sequences
-            .extend(self.tableau.give_complete_sequences());
+            .extend(self.tableau.extract_complete_sequences());
     }
 
     pub fn is_won(&self) -> bool {

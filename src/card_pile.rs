@@ -28,7 +28,7 @@ impl CardPile {
         self.sequences.is_empty()
     }
 
-    pub fn try_give_complete_sequence(&mut self) -> Option<CardSequence> {
+    pub fn try_extract_complete_sequence(&mut self) -> Option<CardSequence> {
         let last_seq = self.sequences.peek();
 
         if last_seq.is_some() && last_seq.unwrap().is_complete() {
