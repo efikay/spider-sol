@@ -20,7 +20,7 @@ impl fmt::Display for GameTableau {
             write!(f, "\t Pile {}:", i + 1)?;
             writeln!(f, "{}", pile)?;
         }
-        writeln!(f, "</>")
+        writeln!(f, "</GameTableau>")
     }
 }
 
