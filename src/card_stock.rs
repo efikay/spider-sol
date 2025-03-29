@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use core::fmt;
+
 use crate::{
     card_deck::CardDeck,
     core::{Card, PILES_AMOUNT},
@@ -11,6 +13,14 @@ pub struct CardStock {
 pub struct InitialCards {
     pub face_down_cards: Vec<Card>,
     pub face_up_cards: Vec<Card>,
+}
+
+impl fmt::Display for CardStock {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        writeln!(f, "<CardStock>")?;
+        writeln!(f, "{}", self.deck)?;
+        writeln!(f, "</CardStock>")
+    }
 }
 
 impl CardStock {
