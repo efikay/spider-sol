@@ -4,7 +4,7 @@ use crate::{card_pile::CardPile, card_stock::InitialCards};
 
 const PILES_AMOUNT: usize = 10;
 
-struct GameTableau {
+pub struct GameTableau {
     piles: [CardPile; PILES_AMOUNT],
 }
 
@@ -30,4 +30,6 @@ impl GameTableau {
 
         pile_cards
     }
+
+    // TODO: Pile move logic
 }

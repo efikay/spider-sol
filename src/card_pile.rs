@@ -16,4 +16,6 @@ impl CardPile {
     pub fn add_card(&mut self, card: Card) {
         self.cards.push(card);
     }
+
+    // TODO: Pile logic + move-out/move-in logic and full_sequence detection
 }
