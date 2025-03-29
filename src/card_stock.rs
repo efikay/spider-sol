@@ -22,6 +22,14 @@ impl CardStock {
         self.deck.len() / PILES_AMOUNT
     }
 
+    pub fn take_deal(&mut self) -> Option<Vec<Card>> {
+        if self.deals_left() > 0 {
+            Some(self.deck.take_and_open_cards(PILES_AMOUNT))
+        } else {
+            None
+        }
+    }
+
     pub fn take_initial_cards(&mut self) -> InitialCards {
         if !self.deck.is_fresh() {
             panic!("We need fresh deck for initial cards allocation!")
