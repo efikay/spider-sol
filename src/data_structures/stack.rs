@@ -2,6 +2,8 @@
 
 use core::fmt;
 
+use super::stack_iter::StackIter;
+
 #[derive(Debug, Clone)]
 pub struct Stack<T> {
     items: Vec<T>,
@@ -26,9 +28,7 @@ impl<T: fmt::Display> fmt::Display for Stack<T> {
 
 impl<T> FromIterator<T> for Stack<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut stack = Stack {
-            items: Vec::new(),
-        };
+        let mut stack = Stack { items: Vec::new() };
 
         for item in iter {
             stack.items.push(item);
@@ -40,9 +40,7 @@ impl<T> FromIterator<T> for Stack<T> {
 
 impl<T: std::clone::Clone> Stack<T> {
     pub fn new() -> Self {
-        Stack {
-            items: Vec::new(),
-        }
+        Stack { items: Vec::new() }
     }
 
     pub fn push(&mut self, item: T) {
@@ -60,9 +58,7 @@ impl<T: std::clone::Clone> Stack<T> {
             desired_amount
         };
 
-        self.items
-            .drain(self.items.len() - amount..)
-            .collect()
+        self.items.drain(self.items.len() - amount..).collect()
     }
 
     pub fn peek(&self) -> Option<&T> {
@@ -79,5 +75,11 @@ impl<T: std::clone::Clone> Stack<T> {
 
     pub fn clear(&mut self) {
         self.items.clear()
+    }
+
+    pub fn iter(&self) -> StackIter<'_, T> {
+        StackIter {
+            iter: self.items.iter(),
+        }
     }
 }
