@@ -11,14 +11,11 @@ fn wait_for_game_mode() -> GameMode {
     game_mode_key_codes.insert(KeyCode::Char('2'), GameMode::TwoSuits);
     game_mode_key_codes.insert(KeyCode::Char('4'), GameMode::FourSuits);
 
-    print!("Press <1> for OneSuit, <2> for TwoSuits or <4> for FourSuits [default=FourSuits]: ");
+    print!("Press <1> for OneSuit, <2> for TwoSuits or <4> for FourSuits: ");
     io::stdout().flush().unwrap();
 
     loop {
         if let Ok(Event::Key(event)) = read() {
-            if event.code == KeyCode::Enter {
-                return GameMode::FourSuits;
-            }
             if let Some(game_mode) = game_mode_key_codes.get(&event.code) {
                 return *game_mode;
             }
@@ -40,6 +37,7 @@ fn wait_for_cards_command() {
 
 pub fn console_debug_deck() {
     let mut deck = CardDeck::new(wait_for_game_mode());
+    let _ = read();
     io::stdout().flush().unwrap();
 
     while !deck.is_empty() {
