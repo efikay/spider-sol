@@ -61,16 +61,16 @@ mod tests {
     fn test_order_validation() {
         let valid_sequences = vec![
             vec![
-                Card::new_opened(Rank::Ace, Suit::Clubs),
-                Card::new_opened(Rank::Two, Suit::Clubs),
-                Card::new_opened(Rank::Three, Suit::Clubs),
-                Card::new_opened(Rank::Four, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Clubs),
+                Card::new(Rank::Two, Suit::Clubs),
+                Card::new(Rank::Three, Suit::Clubs),
+                Card::new(Rank::Four, Suit::Clubs),
             ],
             vec![
-                Card::new_opened(Rank::Queen, Suit::Clubs),
-                Card::new_opened(Rank::King, Suit::Clubs),
+                Card::new(Rank::Queen, Suit::Clubs),
+                Card::new(Rank::King, Suit::Clubs),
             ],
-            vec![Card::new_opened(Rank::Ten, Suit::Clubs)],
+            vec![Card::new(Rank::Ten, Suit::Clubs)],
         ];
         for cards in valid_sequences {
             assert_eq!(is_valid_order(&cards), true);
@@ -78,18 +78,18 @@ mod tests {
 
         let invalid_sequences = vec![
             vec![
-                Card::new_opened(Rank::Ace, Suit::Clubs),
-                Card::new_opened(Rank::Three, Suit::Clubs),
-                Card::new_opened(Rank::Four, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Clubs),
+                Card::new(Rank::Three, Suit::Clubs),
+                Card::new(Rank::Four, Suit::Clubs),
             ],
             vec![
-                Card::new_opened(Rank::King, Suit::Clubs),
-                Card::new_opened(Rank::Ace, Suit::Clubs),
+                Card::new(Rank::King, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Clubs),
             ],
             vec![
-                Card::new_opened(Rank::Three, Suit::Clubs),
-                Card::new_opened(Rank::Two, Suit::Clubs),
-                Card::new_opened(Rank::Ace, Suit::Clubs),
+                Card::new(Rank::Three, Suit::Clubs),
+                Card::new(Rank::Two, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Clubs),
             ],
         ];
         for cards in invalid_sequences {
@@ -101,16 +101,16 @@ mod tests {
     fn test_suit_validation() {
         let valid_sequences = vec![
             vec![
-                Card::new_opened(Rank::Ace, Suit::Hearts),
-                Card::new_opened(Rank::Ace, Suit::Hearts),
-                Card::new_opened(Rank::Ace, Suit::Hearts),
-                Card::new_opened(Rank::Ace, Suit::Hearts),
+                Card::new(Rank::Ace, Suit::Hearts),
+                Card::new(Rank::Ace, Suit::Hearts),
+                Card::new(Rank::Ace, Suit::Hearts),
+                Card::new(Rank::Ace, Suit::Hearts),
             ],
-            vec![Card::new_opened(Rank::Ace, Suit::Diamonds)],
+            vec![Card::new(Rank::Ace, Suit::Diamonds)],
             vec![
-                Card::new_opened(Rank::Ten, Suit::Spades),
-                Card::new_opened(Rank::Ten, Suit::Spades),
-                Card::new_opened(Rank::Ten, Suit::Spades),
+                Card::new(Rank::Ten, Suit::Spades),
+                Card::new(Rank::Ten, Suit::Spades),
+                Card::new(Rank::Ten, Suit::Spades),
             ],
         ];
         for cards in valid_sequences {
@@ -119,23 +119,23 @@ mod tests {
 
         let invalid_sequences = vec![
             vec![
-                Card::new_opened(Rank::Ace, Suit::Clubs),
-                Card::new_opened(Rank::Ace, Suit::Diamonds),
-                Card::new_opened(Rank::Ace, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Diamonds),
+                Card::new(Rank::Ace, Suit::Clubs),
             ],
             vec![
-                Card::new_opened(Rank::King, Suit::Clubs),
-                Card::new_opened(Rank::Ace, Suit::Diamonds),
+                Card::new(Rank::King, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Diamonds),
             ],
             vec![
-                Card::new_opened(Rank::Three, Suit::Clubs),
-                Card::new_opened(Rank::Two, Suit::Clubs),
-                Card::new_opened(Rank::Ace, Suit::Diamonds),
+                Card::new(Rank::Three, Suit::Clubs),
+                Card::new(Rank::Two, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Diamonds),
             ],
             vec![
-                Card::new_opened(Rank::Three, Suit::Diamonds),
-                Card::new_opened(Rank::Two, Suit::Clubs),
-                Card::new_opened(Rank::Ace, Suit::Clubs),
+                Card::new(Rank::Three, Suit::Diamonds),
+                Card::new(Rank::Two, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Clubs),
             ],
         ];
         for cards in invalid_sequences {
@@ -147,16 +147,16 @@ mod tests {
     fn test_sequence_validation() {
         let valid_sequences = vec![
             vec![
-                Card::new_opened(Rank::Ace, Suit::Clubs),
-                Card::new_opened(Rank::Two, Suit::Clubs),
-                Card::new_opened(Rank::Three, Suit::Clubs),
-                Card::new_opened(Rank::Four, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Clubs),
+                Card::new(Rank::Two, Suit::Clubs),
+                Card::new(Rank::Three, Suit::Clubs),
+                Card::new(Rank::Four, Suit::Clubs),
             ],
             vec![
-                Card::new_opened(Rank::Queen, Suit::Clubs),
-                Card::new_opened(Rank::King, Suit::Clubs),
+                Card::new(Rank::Queen, Suit::Clubs),
+                Card::new(Rank::King, Suit::Clubs),
             ],
-            vec![Card::new_opened(Rank::Ten, Suit::Clubs)],
+            vec![Card::new(Rank::Ten, Suit::Clubs)],
         ];
         for cards in valid_sequences {
             assert_eq!(is_valid_sequence(&cards), true);
@@ -164,15 +164,15 @@ mod tests {
 
         let invalid_sequences = vec![
             vec![
-                Card::new_opened(Rank::Ace, Suit::Clubs),
-                Card::new_opened(Rank::Two, Suit::Diamonds),
-                Card::new_opened(Rank::Three, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Clubs),
+                Card::new(Rank::Two, Suit::Diamonds),
+                Card::new(Rank::Three, Suit::Clubs),
             ],
             vec![],
             vec![
-                Card::new_opened(Rank::Four, Suit::Clubs),
-                Card::new_opened(Rank::Five, Suit::Clubs),
-                Card::new_opened(Rank::Seven, Suit::Clubs),
+                Card::new(Rank::Four, Suit::Clubs),
+                Card::new(Rank::Five, Suit::Clubs),
+                Card::new(Rank::Seven, Suit::Clubs),
             ],
         ];
         for cards in invalid_sequences {

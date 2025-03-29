@@ -20,15 +20,7 @@ impl fmt::Display for Card {
 }
 
 impl Card {
-    pub fn new_opened(rank: Rank, suit: Suit) -> Self {
-        Self {
-            rank,
-            suit,
-            is_opened: true,
-        }
-    }
-
-    pub fn new_closed(rank: Rank, suit: Suit) -> Self {
+    pub fn new(rank: Rank, suit: Suit) -> Self {
         Self {
             rank,
             suit,
@@ -57,6 +49,6 @@ impl Card {
     }
 
     pub fn make_full_sequence_of(suit: Suit) -> Vec<Card> {
-        Rank::iter().map(|r| Card::new_closed(r, suit)).collect()
+        Rank::iter().map(|r| Card::new(r, suit)).collect()
     }
 }
