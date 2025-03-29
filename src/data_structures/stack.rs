@@ -26,15 +26,15 @@ impl<T: fmt::Display> fmt::Display for Stack<T> {
 
 impl<T> FromIterator<T> for Stack<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut c = Stack {
+        let mut stack = Stack {
             items: Vec::new(),
         };
 
         for item in iter {
-            c.items.push(item);
+            stack.items.push(item);
         }
 
-        c
+        stack
     }
 }
 
