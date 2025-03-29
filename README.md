@@ -10,6 +10,7 @@ Info:
   - [x] Card sequences
   - [x] Card piles
   - [x] Full sequences
+  - [x] Deals
   - [x] Win condition
   - [ ] Move cards between piles
   - [ ] ...etc?
