@@ -72,17 +72,17 @@ impl CardSequence {
 }
 
 fn is_valid_sequence(cards: &Vec<Card>) -> bool {
+    fn is_same_suit(cards: &Vec<Card>) -> bool {
+        let suit = cards.first().unwrap().suit;
+
+        cards.iter().all(|c| c.suit == suit)
+    }
+
+    fn is_valid_order(cards: &Vec<Card>) -> bool {
+        cards.windows(2).all(|w| w[0].can_stack_on(&w[1]))
+    }
+
     !cards.is_empty() && is_same_suit(&cards) && is_valid_order(&cards)
-}
-
-fn is_same_suit(cards: &Vec<Card>) -> bool {
-    let suit = cards.first().unwrap().suit;
-
-    cards.iter().all(|c| c.suit == suit)
-}
-
-fn is_valid_order(cards: &Vec<Card>) -> bool {
-    cards.windows(2).all(|w| w[0].can_stack_on(&w[1]))
 }
 
 #[cfg(test)]
