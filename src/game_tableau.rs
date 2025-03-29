@@ -18,7 +18,7 @@ impl fmt::Display for GameTableau {
         writeln!(f, "<GameTableau>")?;
         writeln!(f, "Piles:")?;
         for (i, pile) in self.piles.iter().enumerate() {
-            write!(f, "\t Pile {}:", i + 1)?;
+            write!(f, "\t Pile {}:", i)?;
             writeln!(f, "{}", pile)?;
         }
         writeln!(f, "</GameTableau>")
@@ -77,7 +77,7 @@ impl GameTableau {
         let mut available_moves = vec![];
 
         for (src_pile_idx, src_cards) in top_pile_cards.iter().enumerate() {
-            for dest_pile_idx in (0..src_pile_idx).chain(src_pile_idx..) {
+            for dest_pile_idx in (0..src_pile_idx).chain(src_pile_idx+1..PILES_AMOUNT) {
                 if let Some(dest_tip_card) = &top_pile_cards[dest_pile_idx].get(0) {
                     for (src_card_idx, src_card) in src_cards.iter().enumerate() {
                         if src_card.can_place_on(&dest_tip_card) {
