@@ -20,11 +20,11 @@ impl GameTableau {
         let mut pile_index = 0;
 
         cards.face_down_cards.drain(..).for_each(|card| {
-            pile_cards[pile_index].add_card(card);
+            pile_cards[pile_index].add_deal_card(card);
             pile_index = (pile_index + 1) % PILES_AMOUNT;
         });
         cards.face_up_cards.drain(..).for_each(|card| {
-            pile_cards[pile_index].add_card(card);
+            pile_cards[pile_index].add_deal_card(card);
             pile_index = (pile_index + 1) % PILES_AMOUNT;
         });
 

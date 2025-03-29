@@ -20,12 +20,50 @@ impl CardSequence {
 
         Self { cards }
     }
+    pub fn from_card(card: Card) -> Self {
+        Self { cards: vec![card] }
+    }
+
+    pub fn add_cards(&mut self, cards: Vec<Card>) -> bool {
+        let mut next_state = Vec::from(&self.cards[..]);
+        next_state.extend(cards.iter());
+
+        if is_valid_sequence(&next_state) {
+            self.cards = next_state;
+
+            return true;
+        }
+        false
+    }
+    pub fn add_card(&mut self, card: Card) -> bool {
+        self.add_cards(vec![card])
+    }
 
     pub fn suit(&self) -> Suit {
         match self.cards.first() {
             Some(first_card) => first_card.suit,
             None => panic!("Sequence have to contain at least one card!"),
         }
+    }
+
+    pub fn group_into_sequences(cards: &mut Vec<Card>) -> Vec<CardSequence> {
+        let mut sequences: Vec<CardSequence> = vec![];
+        let mut pending_seq_cards: Vec<Card> = vec![];
+
+        while !cards.is_empty() {
+            let card = cards.remove(0);
+
+            if pending_seq_cards.is_empty() {
+                pending_seq_cards.push(card);
+            } else if card.can_stack_on(pending_seq_cards.last().unwrap()) {
+                pending_seq_cards.push(card);
+            } else {
+                sequences.push(CardSequence::new(pending_seq_cards));
+                pending_seq_cards = vec![];
+            }
+        }
+
+        sequences
     }
 }
 
