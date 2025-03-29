@@ -15,7 +15,19 @@ pub struct Card {
 
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "<{}{}>", self.rank.to_human(), self.suit.symbol())
+        let (opened_bracket, closed_bracket) = match self.is_opened {
+            true => ('<', '>'),
+            false => ('{', '}'),
+        };
+
+        write!(
+            f,
+            "{}{}{}{}",
+            opened_bracket,
+            self.rank.to_human(),
+            self.suit.symbol(),
+            closed_bracket
+        )
     }
 }
 
