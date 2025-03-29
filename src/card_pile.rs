@@ -1,9 +1,20 @@
 #![allow(dead_code)]
 
+use core::fmt;
+
 use crate::{card_sequence::CardSequence, core::Card, data_structures::Stack};
 
 pub struct CardPile {
     sequences: Stack<CardSequence>,
+}
+
+impl fmt::Display for CardPile {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        for card in self.cards() {
+            write!(f, "\t{}", card)?;
+        }
+        write!(f, "")
+    }
 }
 
 impl CardPile {
@@ -41,6 +52,13 @@ impl CardPile {
             }
             None => self.sequences.push(CardSequence::from_card(card)),
         }
+    }
+
+    fn cards(&self) -> Vec<Card> {
+        self.sequences
+            .iter()
+            .flat_map(|seq| seq.cards.clone())
+            .collect()
     }
 
     // TODO: Pile logic + move-out/move-in logic and full_sequence detection
