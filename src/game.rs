@@ -3,7 +3,7 @@
 use core::fmt;
 
 use crate::{
-    card_deck::CardDeck, card_sequence::CardSequence, card_stock::CardStock, core::GameMode,
+    card_deck::CardDeck, card_sequence::CardSequence, card_stock::CardStock,
     game_tableau::GameTableau,
 };
 
@@ -24,8 +24,8 @@ impl fmt::Display for Game {
 }
 
 impl Game {
-    pub fn new(game_mode: GameMode) -> Self {
-        let mut stock = CardStock::new(CardDeck::new(game_mode));
+    pub fn new(deck: CardDeck) -> Self {
+        let mut stock = CardStock::new(deck);
         let tableau = GameTableau::new(stock.take_initial_cards());
 
         Self {
