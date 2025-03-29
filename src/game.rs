@@ -10,7 +10,7 @@ use crate::{
 pub struct Game {
     tableau: GameTableau,
     stock: CardStock,
-    finished_sequences: Vec<CardSequence>,
+    complete_sequences: Vec<CardSequence>,
 }
 
 impl fmt::Display for Game {
@@ -31,7 +31,7 @@ impl Game {
         Self {
             stock,
             tableau,
-            finished_sequences: vec![],
+            complete_sequences: vec![],
         }
     }
 
