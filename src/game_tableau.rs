@@ -3,7 +3,8 @@
 use core::fmt;
 
 use crate::{
-    card_pile::CardPile, card_sequence::CardSequence, card_stock::InitialCards, core::Card,
+    available_move::AvailableMove, card_pile::CardPile, card_sequence::CardSequence,
+    card_stock::InitialCards, core::Card,
 };
 
 const PILES_AMOUNT: usize = 10;
@@ -66,6 +67,31 @@ impl GameTableau {
         });
 
         pile_cards
+    }
+
+    // TODO: There's definitely place for optimization (place some breaks at least)
+    // TODO: Simplify or move to another module and chunk logic parts
+    pub fn calculate_available_moves(&self) -> Vec<AvailableMove> {
+        let top_pile_cards: Vec<Vec<Card>> =
+            self.piles.iter().map(|pile| pile.top_cards()).collect();
+        let mut available_moves = vec![];
+
+        for (src_pile_idx, src_cards) in top_pile_cards.iter().enumerate() {
+            for dest_pile_idx in (0..src_pile_idx).chain(src_pile_idx..) {
+                if let Some(dest_tip_card) = &top_pile_cards[dest_pile_idx].get(0) {
+                    for (src_card_idx, src_card) in src_cards.iter().enumerate() {
+                        if src_card.can_place_on(&dest_tip_card) {
+                            available_moves.push(AvailableMove::new(
+                                (src_pile_idx, src_card_idx),
+                                src_pile_idx,
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        available_moves
     }
 
     // TODO: Pile move logic

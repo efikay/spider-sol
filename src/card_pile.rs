@@ -62,6 +62,14 @@ impl CardPile {
         }
     }
 
+    pub fn top_cards(&self) -> Vec<Card> {
+        if let Some(top_seq) = self.sequences.peek() {
+            top_seq.cards.clone()
+        } else {
+            vec![]
+        }
+    }
+
     fn cards(&self) -> Vec<Card> {
         self.sequences
             .iter()

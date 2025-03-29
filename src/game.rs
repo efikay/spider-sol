@@ -3,8 +3,8 @@
 use core::fmt;
 
 use crate::{
-    card_deck::CardDeck, card_sequence::CardSequence, card_stock::CardStock,
-    game_tableau::GameTableau,
+    available_move::AvailableMove, card_deck::CardDeck, card_sequence::CardSequence,
+    card_stock::CardStock, game_tableau::GameTableau,
 };
 
 pub struct Game {
@@ -45,6 +45,10 @@ impl Game {
         } else {
             panic!("No deals left :(");
         }
+    }
+
+    pub fn get_available_moves(&self) -> Vec<AvailableMove> {
+        self.tableau.calculate_available_moves()
     }
 
     pub fn search_and_update_complete_sequences(&mut self) {

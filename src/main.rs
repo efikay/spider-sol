@@ -10,6 +10,7 @@ mod card_stock;
 mod debug_examples;
 mod game;
 mod game_tableau;
+mod available_move;
 
 fn main() {
     console_debug_game_start_and_deals();
