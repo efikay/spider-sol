@@ -2,7 +2,7 @@
 
 use crossterm::event::{Event, KeyCode, read};
 
-use crate::{card_deck::CardDeck, card_stock::CardStock, core::GameMode, game::Game};
+use crate::game::{card_deck::CardDeck, card_stock::CardStock, core::GameMode, game::Game};
 
 pub fn console_debug_game_start_and_deals() {
     let stock = CardStock::new(CardDeck::new(GameMode::FourSuits));

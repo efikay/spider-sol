@@ -2,8 +2,8 @@
 
 use core::fmt;
 
-use crate::{
-    available_move::AvailableMove, card_sequence::CardSequence, card_stock_trait::ICardStock,
+use crate::game::{
+    card_sequence::CardSequence, card_stock_trait::ICardStock, data_types::AvailableMove,
     game_tableau::GameTableau,
 };
 

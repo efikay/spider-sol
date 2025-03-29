@@ -5,7 +5,7 @@ use std::io::{self, Write};
 
 use crossterm::event::{Event, KeyCode, read};
 
-use crate::{card_deck::CardDeck, core::GameMode};
+use crate::game::{card_deck::CardDeck, core::GameMode};
 
 fn wait_for_game_mode() -> GameMode {
     let mut game_mode_key_codes = HashMap::new();

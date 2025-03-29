@@ -5,7 +5,7 @@
  * Debatable. Maybe I'll refuse to use this in future.
  * Looks-like overhead maybe.
  */
-use crate::core::{Card, FULL_SEQUENCE_LENGTH, Suit};
+use crate::game::core::{Card, FULL_SEQUENCE_LENGTH, Suit};
 
 #[derive(Debug, Clone)]
 pub struct CardSequence {
@@ -87,7 +87,7 @@ fn is_valid_sequence(cards: &Vec<Card>) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::Rank;
+    use crate::game::core::Rank;
 
     use super::*;
 

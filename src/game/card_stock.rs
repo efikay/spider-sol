@@ -2,9 +2,9 @@
 
 use core::fmt;
 
-use crate::{
-    card_stock_trait::ICardStock,
+use crate::game::{
     card_deck::CardDeck,
+    card_stock_trait::ICardStock,
     core::{Card, PILES_AMOUNT},
 };
 pub struct CardStock {

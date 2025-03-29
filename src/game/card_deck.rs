@@ -6,8 +6,8 @@ use rand::prelude::*;
 use strum::IntoEnumIterator;
 
 use crate::{
-    core::{Card, GameMode, Suit},
     data_structures::Stack,
+    game::core::{Card, GameMode, Suit},
 };
 
 pub struct CardDeck {

@@ -2,9 +2,9 @@
 
 use core::fmt;
 
-use crate::{
-    available_move::AvailableMove, card_pile::CardPile, card_sequence::CardSequence,
-    card_stock::InitialCards, core::Card,
+use crate::game::{
+    card_pile::CardPile, card_sequence::CardSequence, card_stock::InitialCards, core::Card,
+    data_types::AvailableMove,
 };
 
 const PILES_AMOUNT: usize = 10;
@@ -77,7 +77,7 @@ impl GameTableau {
         let mut available_moves = vec![];
 
         for (src_pile_idx, src_cards) in top_pile_cards.iter().enumerate() {
-            for dest_pile_idx in (0..src_pile_idx).chain(src_pile_idx+1..PILES_AMOUNT) {
+            for dest_pile_idx in (0..src_pile_idx).chain(src_pile_idx + 1..PILES_AMOUNT) {
                 if let Some(dest_tip_card) = &top_pile_cards[dest_pile_idx].get(0) {
                     for (src_card_idx, src_card) in src_cards.iter().enumerate() {
                         if src_card.can_place_on(&dest_tip_card) {

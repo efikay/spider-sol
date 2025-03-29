@@ -1,4 +1,4 @@
-use crate::{card_stock::InitialCards, core::Card};
+use crate::game::{card_stock::InitialCards, core::Card};
 
 pub trait ICardStock {
     fn deals_left(&self) -> usize;

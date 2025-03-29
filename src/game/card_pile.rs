@@ -2,7 +2,10 @@
 
 use core::fmt;
 
-use crate::{card_sequence::CardSequence, core::Card, data_structures::Stack};
+use crate::{
+    data_structures::Stack,
+    game::{card_sequence::CardSequence, core::Card},
+};
 
 pub struct CardPile {
     sequences: Stack<CardSequence>,
