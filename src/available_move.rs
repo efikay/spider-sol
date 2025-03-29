@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use std::fmt;
+
 #[derive(Debug, Copy, Clone)]
 pub struct TopCardLocation {
     pile_index: usize,
@@ -11,6 +13,16 @@ type CardPileIndex = usize;
 pub struct AvailableMove {
     from: TopCardLocation,
     to: CardPileIndex,
+}
+
+impl fmt::Display for AvailableMove {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "AvailableMove {{ from: {{ pile: {}, card_idx: {} }}, to_pile: {}  }}",
+            self.from.pile_index, self.from.top_card_index, self.to
+        )
+    }
 }
 
 impl AvailableMove {
