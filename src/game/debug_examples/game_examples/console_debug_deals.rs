@@ -30,7 +30,7 @@ pub fn console_debug_deals() {
         SameCardIncDealStock::new(Rank::Two),
     );
 
-    println!("Game started (aces start, same card++ deals), FourSuits mode");
+    println!("Game started (aces start, same card++ deals)");
     while game.deals_left() > 0 {
         println!("{}", game);
 
