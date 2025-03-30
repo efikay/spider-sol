@@ -1,7 +1,8 @@
 #![allow(unused_imports)]
 
 mod deck;
-mod game;
+mod mock_parts;
+mod game_examples;
 
 pub use deck::console_debug_deck;
-pub use game::console_debug_game_start_and_deals;
+pub use game_examples::*;

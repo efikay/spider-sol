@@ -38,6 +38,15 @@ impl<T> FromIterator<T> for Stack<T> {
     }
 }
 
+impl<'a, T> IntoIterator for &'a Stack<T> {
+    type Item = &'a T;
+    type IntoIter = std::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.items.iter()
+    }
+}
+
 impl<T: std::clone::Clone> Stack<T> {
     pub fn new() -> Self {
         Stack { items: Vec::new() }

@@ -13,8 +13,8 @@ pub struct CardPile {
 
 impl fmt::Display for CardPile {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        for card in self.cards() {
-            write!(f, "\t{}", card)?;
+        for seq in &self.sequences {
+            write!(f, "\t{}", seq)?;
         }
         write!(f, "")
     }
@@ -24,6 +24,13 @@ impl CardPile {
     pub fn new() -> Self {
         Self {
             sequences: Stack::new(),
+        }
+    }
+    pub fn from_cards(mut cards: Vec<Card>) -> Self {
+        let sequences = CardSequence::group_into_sequences(&mut cards);
+
+        Self {
+            sequences: Stack::from_iter(sequences),
         }
     }
 

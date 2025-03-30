@@ -39,6 +39,13 @@ impl Card {
             is_opened: false,
         }
     }
+    pub fn new_opened(rank: Rank, suit: Suit) -> Self {
+        Self {
+            rank,
+            suit,
+            is_opened: true,
+        }
+    }
 
     pub fn simple_color(&self) -> &'static str {
         match self.suit {
@@ -61,8 +68,8 @@ impl Card {
         self.rank.value() == other.rank.value() - 1 && self.suit == other.suit
     }
     // Can card be stacked with any other card
-    pub fn can_place_on(&self, other: &Card) -> bool {
-        self.rank.value() == other.rank.value() - 1
+    pub fn can_move_on(&self, other: &Card) -> bool {
+        other.is_opened && self.rank.value() == other.rank.value() - 1
     }
 
     pub fn make_full_sequence_of(suit: Suit) -> Vec<Card> {

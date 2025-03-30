@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
@@ -56,6 +57,13 @@ impl Rank {
     pub fn value(self) -> u8 {
         self as u8
     }
+    pub fn from_value(value: u8) -> Option<Self> {
+        Rank::iter().nth((value - 1) as usize)
+    }
+    pub fn next(self) -> Option<Self> {
+        Rank::from_value(self.value() + 1)
+    }
+
     pub fn to_human(self) -> String {
         match self {
             Rank::Ace => "A".to_owned(),

@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use core::fmt;
+
 /** Note about this module.
  *
  * Debatable. Maybe I'll refuse to use this in future.
@@ -10,6 +12,19 @@ use crate::game::core::{Card, FULL_SEQUENCE_LENGTH, Suit};
 #[derive(Debug, Clone)]
 pub struct CardSequence {
     pub cards: Vec<Card>,
+}
+
+impl fmt::Display for CardSequence {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let stringified_cards = self
+            .cards
+            .iter()
+            .map(|c| c.to_string())
+            .collect::<Vec<String>>()
+            .join(",");
+
+        write!(f, "[{}]", stringified_cards)
+    }
 }
 
 impl CardSequence {
