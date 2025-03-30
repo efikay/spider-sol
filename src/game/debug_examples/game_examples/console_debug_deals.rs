@@ -38,6 +38,7 @@ pub fn console_debug_deals() {
         if let Ok(Event::Key(event)) = read() {
             if event.code == KeyCode::Enter {
                 game.deal_cards();
+                game.search_and_update_complete_sequences();
                 continue;
             }
         }

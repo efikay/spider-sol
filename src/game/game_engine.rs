@@ -15,15 +15,17 @@ pub struct GameEngine<CardStockT: ICardStock> {
 
 impl<CardStockT: ICardStock + std::fmt::Display> fmt::Display for GameEngine<CardStockT> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        writeln!(f, "<Game>")?;
+        writeln!(f, "<GameEngine>")?;
         writeln!(f, "{}", self.stock)?;
         writeln!(f, "{}", self.tableau)?;
+        writeln!(f, "Complete sequences: {}", self.complete_sequences.len())?;
         writeln!(f, "Deals left: {}", self.stock.deals_left())?;
+        writeln!(f, "Won?: {}", self.is_won())?;
         writeln!(f, "Available moves:")?;
         for available_move in self.get_available_moves() {
             writeln!(f, "\t{}", available_move)?;
         }
-        writeln!(f, "</Game>")
+        writeln!(f, "</GameEngine>")
     }
 }
 
@@ -67,7 +69,7 @@ impl<CardStockT: ICardStock> GameEngine<CardStockT> {
     }
 
     pub fn is_won(&self) -> bool {
-        self.complete_sequences.len() == 8
+        self.complete_sequences.len() >= 8
     }
 
     // TODO: More game logic
