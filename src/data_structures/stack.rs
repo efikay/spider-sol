@@ -67,7 +67,10 @@ impl<T: std::clone::Clone> Stack<T> {
             desired_amount
         };
 
-        self.items.drain(self.items.len() - amount..).collect()
+        self.items
+            .drain(self.items.len() - amount..)
+            .rev()
+            .collect()
     }
 
     pub fn peek(&self) -> Option<&T> {
@@ -90,5 +93,48 @@ impl<T: std::clone::Clone> Stack<T> {
         StackIter {
             iter: self.items.iter(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Stack;
+
+    #[test]
+    fn should_be_lifo() {
+        let mut stack = Stack::from_iter([1, 2, 3]);
+
+        assert_eq!(stack.pop().unwrap(), 3);
+        assert_eq!(stack.pop().unwrap(), 2);
+        assert_eq!(stack.pop().unwrap(), 1);
+        assert!(stack.is_empty());
+    }
+
+    #[test]
+    fn should_pop_many() {
+        let mut stack = Stack::from_iter([1, 2, 3, 4, 5]);
+
+        assert_eq!(stack.pop_many(3), vec![5, 4, 3]);
+        assert_eq!(stack.len(), 2);
+    }
+
+    #[test]
+    fn should_pop_many_as_many_as_can() {
+        let mut stack = Stack::from_iter([1, 2, 3, 4, 5]);
+
+        assert_eq!(stack.pop_many(10), vec![5, 4, 3, 2, 1]);
+        assert!(stack.is_empty());
+    }
+
+    #[test]
+    fn iter_should_be_lifo() {
+        let input: Vec<i32> = vec![1, 2, 3, 4, 5];
+
+        let stack_from_input = Stack::from_iter(input.clone());
+
+        let mut output_from_stack = Vec::from_iter(stack_from_input.iter().map(|number| *number));
+        output_from_stack.reverse();
+
+        assert_eq!(input, output_from_stack);
     }
 }
