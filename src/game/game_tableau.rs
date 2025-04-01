@@ -72,8 +72,7 @@ impl GameTableau {
         pile_cards
     }
 
-    // TODO: There's definitely place for optimization (place some breaks at least)
-    // TODO: Simplify or move to another module and chunk logic parts
+    // TODO: Move available_moves calculation logic into Pile static methods?
     pub fn calculate_available_moves(&self) -> Vec<AvailableMove> {
         let mut moves = self.calculate_card_on_card_moves();
         moves.extend(self.calculate_empty_pile_moves());
