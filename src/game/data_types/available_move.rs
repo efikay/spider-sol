@@ -3,23 +3,23 @@
 use std::fmt;
 
 #[derive(Debug, Copy, Clone)]
-pub struct TopCardLocation {
+pub struct PlayableCardLocation {
     pub pile_index: usize,
-    pub top_card_index: usize,
+    pub card_index: usize,
 }
-type CardPileIndex = usize;
+type PileIndex = usize;
 
 #[derive(Debug)]
 pub struct AvailableMove {
-    from: TopCardLocation,
-    to: CardPileIndex,
+    from: PlayableCardLocation,
+    to: PileIndex,
 }
 
 // Implement equality traits
 impl PartialEq for AvailableMove {
     fn eq(&self, other: &Self) -> bool {
         self.from.pile_index == other.from.pile_index
-            && self.from.top_card_index == other.from.top_card_index
+            && self.from.card_index == other.from.card_index
             && self.to == other.to
     }
 }
@@ -36,7 +36,7 @@ impl Ord for AvailableMove {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         match self.from.pile_index.cmp(&other.from.pile_index) {
             std::cmp::Ordering::Equal => {
-                match self.from.top_card_index.cmp(&other.from.top_card_index) {
+                match self.from.card_index.cmp(&other.from.card_index) {
                     std::cmp::Ordering::Equal => self.to.cmp(&other.to),
                     ordering => ordering,
                 }
@@ -51,23 +51,23 @@ impl fmt::Display for AvailableMove {
         write!(
             f,
             "AvailableMove {{ from: {{ pile: {}, card_idx: {} }}, to_pile: {}  }}",
-            self.from.pile_index, self.from.top_card_index, self.to
+            self.from.pile_index, self.from.card_index, self.to
         )
     }
 }
 
 impl AvailableMove {
-    pub fn new((src_pile_index, src_top_card_index): (usize, usize), to: usize) -> Self {
+    pub fn new((src_pile_index, src_card_index): (usize, usize), to: usize) -> Self {
         Self {
-            from: TopCardLocation {
+            from: PlayableCardLocation {
                 pile_index: src_pile_index,
-                top_card_index: src_top_card_index,
+                card_index: src_card_index,
             },
             to,
         }
     }
 
-    pub fn from(&self) -> TopCardLocation {
+    pub fn from(&self) -> PlayableCardLocation {
         self.from
     }
 

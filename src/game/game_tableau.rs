@@ -82,17 +82,17 @@ impl GameTableau {
     }
 
     fn calculate_card_on_card_moves(&self) -> Vec<AvailableMove> {
-        let top_pile_cards: Vec<Vec<Card>> =
-            self.piles.iter().map(|pile| pile.top_cards()).collect();
+        let playable_cards_by_pile: Vec<Vec<Card>> =
+            self.piles.iter().map(|pile| pile.playable_cards()).collect();
         let mut available_moves = vec![];
 
-        for (src_pile_idx, src_cards) in top_pile_cards.iter().enumerate() {
+        for (src_pile_idx, src_cards) in playable_cards_by_pile.iter().enumerate() {
             for dest_pile_idx in 0..PILES_AMOUNT {
                 if dest_pile_idx == src_pile_idx {
                     continue;
                 }
 
-                if let Some(dest_tip_card) = &top_pile_cards[dest_pile_idx].last() {
+                if let Some(dest_tip_card) = &playable_cards_by_pile[dest_pile_idx].last() {
                     for (src_card_idx, src_card) in src_cards.iter().rev().enumerate() {
                         if src_card.can_move_on(&dest_tip_card) {
                             available_moves.push(AvailableMove::new(
@@ -109,13 +109,13 @@ impl GameTableau {
         available_moves
     }
     fn calculate_empty_pile_moves(&self) -> Vec<AvailableMove> {
-        let top_pile_cards: Vec<Vec<Card>> =
-            self.piles.iter().map(|pile| pile.top_cards()).collect();
+        let playable_cards_by_pile: Vec<Vec<Card>> =
+            self.piles.iter().map(|pile| pile.playable_cards()).collect();
         let mut available_moves = vec![];
 
-        for (src_pile_idx, src_cards) in top_pile_cards.iter().enumerate() {
+        for (src_pile_idx, src_cards) in playable_cards_by_pile.iter().enumerate() {
             for dest_pile_idx in 0..PILES_AMOUNT {
-                let dest_pile = &top_pile_cards[dest_pile_idx];
+                let dest_pile = &playable_cards_by_pile[dest_pile_idx];
 
                 if dest_pile_idx == src_pile_idx || !dest_pile.is_empty() {
                     continue;

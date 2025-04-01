@@ -8,6 +8,7 @@ use crate::{
 };
 
 pub struct CardPile {
+    // Desc order (Playable seq is last)
     sequences: Stack<CardSequence>,
 }
 
@@ -72,9 +73,9 @@ impl CardPile {
         }
     }
 
-    pub fn top_cards(&self) -> Vec<Card> {
-        if let Some(top_seq) = self.sequences.peek() {
-            top_seq.cards.clone()
+    pub fn playable_cards(&self) -> Vec<Card> {
+        if let Some(last_seq) = self.sequences.peek() {
+            last_seq.cards.clone()
         } else {
             vec![]
         }

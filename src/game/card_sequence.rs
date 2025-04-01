@@ -11,6 +11,7 @@ use crate::game::core::{Card, FULL_SEQUENCE_LENGTH, Suit};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CardSequence {
+    // Desc order (K,Q,J,10,9..etc)
     pub cards: Vec<Card>,
 }
 
