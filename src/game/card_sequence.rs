@@ -7,10 +7,7 @@ use core::fmt;
  * Debatable. Maybe I'll refuse to use this in future.
  * Looks-like overhead maybe.
  */
-use crate::{
-    data_structures::Stack,
-    game::core::{Card, FULL_SEQUENCE_LENGTH, Suit},
-};
+use crate::game::core::{Card, FULL_SEQUENCE_LENGTH, Suit};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CardSequence {
