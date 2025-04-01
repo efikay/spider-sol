@@ -7,9 +7,12 @@ use core::fmt;
  * Debatable. Maybe I'll refuse to use this in future.
  * Looks-like overhead maybe.
  */
-use crate::game::core::{Card, FULL_SEQUENCE_LENGTH, Suit};
+use crate::{
+    data_structures::Stack,
+    game::core::{Card, FULL_SEQUENCE_LENGTH, Suit},
+};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CardSequence {
     pub cards: Vec<Card>,
 }
@@ -38,6 +41,9 @@ impl CardSequence {
     pub fn from_card(card: Card) -> Self {
         Self { cards: vec![card] }
     }
+    pub fn from_cards(cards: Vec<Card>) -> Self {
+        Self { cards }
+    }
 
     pub fn add_cards(&mut self, cards: Vec<Card>) -> bool {
         let mut next_state = Vec::from(&self.cards[..]);
@@ -65,12 +71,19 @@ impl CardSequence {
         }
     }
 
+    /**
+     * Example.
+     * input=Vec<A,2,3,5,6,7,8,8,8,9,10,J,Q,K>
+     * output=Vec<CardSeq[K,Q,J,10,9,8],CardSeq[8],CardSeq[8,7,6,5],CardSeq[3,2,A]>
+     *
+     * (Special helper for CardPile::from_cards constructor, stack-rdy)
+     */
     pub fn group_into_sequences(cards: &mut Vec<Card>) -> Vec<CardSequence> {
         let mut sequences: Vec<CardSequence> = vec![];
-        let mut pending_seq_cards: Vec<Card> = vec![];
+        let mut pending_seq_cards: Vec<Card> = Vec::new();
 
         while !cards.is_empty() {
-            let card = cards.remove(0);
+            let card = cards.pop().unwrap();
 
             if pending_seq_cards.is_empty() {
                 pending_seq_cards.push(card);
@@ -78,8 +91,11 @@ impl CardSequence {
                 pending_seq_cards.push(card);
             } else {
                 sequences.push(CardSequence::new(pending_seq_cards));
-                pending_seq_cards = vec![];
+                pending_seq_cards = vec![card];
             }
+        }
+        if !pending_seq_cards.is_empty() {
+            sequences.push(CardSequence::new(pending_seq_cards));
         }
 
         sequences
@@ -94,7 +110,12 @@ fn is_valid_sequence(cards: &Vec<Card>) -> bool {
     }
 
     fn is_valid_order(cards: &Vec<Card>) -> bool {
-        cards.windows(2).all(|w| w[0].can_stack_on(&w[1]))
+        cards.windows(2).all(|pair| {
+            let higher_card = &pair[0];
+            let lower_card = &pair[1];
+
+            lower_card.can_stack_on(higher_card)
+        })
     }
 
     !cards.is_empty() && is_same_suit(&cards) && is_valid_order(&cards)
@@ -118,14 +139,14 @@ mod tests {
     fn test_sequence_validation() {
         let valid_sequences = vec![
             vec![
-                Card::new(Rank::Ace, Suit::Clubs),
-                Card::new(Rank::Two, Suit::Clubs),
-                Card::new(Rank::Three, Suit::Clubs),
                 Card::new(Rank::Four, Suit::Clubs),
+                Card::new(Rank::Three, Suit::Clubs),
+                Card::new(Rank::Two, Suit::Clubs),
+                Card::new(Rank::Ace, Suit::Clubs),
             ],
             vec![
-                Card::new(Rank::Queen, Suit::Clubs),
                 Card::new(Rank::King, Suit::Clubs),
+                Card::new(Rank::Queen, Suit::Clubs),
             ],
             vec![Card::new(Rank::Ten, Suit::Clubs)],
         ];
@@ -141,13 +162,63 @@ mod tests {
             ],
             vec![],
             vec![
-                Card::new(Rank::Four, Suit::Clubs),
-                Card::new(Rank::Five, Suit::Clubs),
                 Card::new(Rank::Seven, Suit::Clubs),
+                Card::new(Rank::Five, Suit::Clubs),
+                Card::new(Rank::Four, Suit::Clubs),
             ],
         ];
         for cards in invalid_sequences {
             assert_eq!(is_valid_sequence(&cards), false);
         }
+    }
+
+    #[test]
+    fn test_card_grouping_broken_full_seq() {
+        let mut cards = vec![
+            Card::new(Rank::Ace, Suit::Spades),
+            Card::new(Rank::Two, Suit::Spades),
+            Card::new(Rank::Three, Suit::Spades),
+            //
+            Card::new(Rank::Five, Suit::Spades),
+            Card::new(Rank::Six, Suit::Spades),
+            Card::new(Rank::Seven, Suit::Spades),
+            Card::new(Rank::Eight, Suit::Spades),
+            //
+            Card::new(Rank::Eight, Suit::Spades),
+            //
+            Card::new(Rank::Eight, Suit::Spades),
+            Card::new(Rank::Nine, Suit::Spades),
+            Card::new(Rank::Ten, Suit::Spades),
+            Card::new(Rank::Jack, Suit::Spades),
+            Card::new(Rank::Queen, Suit::Spades),
+            Card::new(Rank::King, Suit::Spades),
+        ];
+
+        let expected_sequences = vec![
+            CardSequence::from_cards(vec![
+                Card::new(Rank::King, Suit::Spades),
+                Card::new(Rank::Queen, Suit::Spades),
+                Card::new(Rank::Jack, Suit::Spades),
+                Card::new(Rank::Ten, Suit::Spades),
+                Card::new(Rank::Nine, Suit::Spades),
+                Card::new(Rank::Eight, Suit::Spades),
+            ]),
+            CardSequence::from_cards(vec![Card::new(Rank::Eight, Suit::Spades)]),
+            CardSequence::from_cards(vec![
+                Card::new(Rank::Eight, Suit::Spades),
+                Card::new(Rank::Seven, Suit::Spades),
+                Card::new(Rank::Six, Suit::Spades),
+                Card::new(Rank::Five, Suit::Spades),
+            ]),
+            CardSequence::from_cards(vec![
+                Card::new(Rank::Three, Suit::Spades),
+                Card::new(Rank::Two, Suit::Spades),
+                Card::new(Rank::Ace, Suit::Spades),
+            ]),
+        ];
+
+        let result = CardSequence::group_into_sequences(&mut cards);
+
+        assert_eq!(expected_sequences, result);
     }
 }

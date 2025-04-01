@@ -6,7 +6,7 @@ use strum::IntoEnumIterator;
 
 use super::{Rank, Suit};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Card {
     pub rank: Rank,
     pub suit: Suit,
@@ -69,7 +69,7 @@ impl Card {
     }
     // Can card be stacked with any other card
     pub fn can_move_on(&self, other: &Card) -> bool {
-        other.is_opened && self.rank.value() == other.rank.value() - 1
+        other.is_opened && self.rank.value() + 1 == other.rank.value()
     }
 
     pub fn make_full_sequence_of(suit: Suit) -> Vec<Card> {

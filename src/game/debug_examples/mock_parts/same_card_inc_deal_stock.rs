@@ -35,7 +35,7 @@ impl ICardStock for SameCardIncDealStock {
         let same_cards = (0..PILES_AMOUNT)
             .map(|_| Card::new_opened(self.rank, Suit::Spades))
             .collect();
-        self.rank = Rank::next(self.rank).unwrap_or(Rank::Ace);
+        self.rank = self.rank.next().unwrap_or(Rank::Ace);
 
         Some(same_cards)
     }

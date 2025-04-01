@@ -3,7 +3,7 @@
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, PartialOrd, Ord)]
 pub enum Suit {
     Spades,
     Hearts,
@@ -13,17 +13,17 @@ pub enum Suit {
 impl Suit {
     pub fn color(&self) -> &'static str {
         match self {
-            Suit::Hearts => "Red",
-            Suit::Spades => "Black",
-            Suit::Clubs => "Blue",
-            Suit::Diamonds => "Orange",
+            Suit::Hearts => "🔴",
+            Suit::Spades => "⚫️",
+            Suit::Clubs => "🔵",
+            Suit::Diamonds => "🟠",
         }
     }
 
     pub fn simple_color(&self) -> &'static str {
         match self {
-            Suit::Hearts | Suit::Diamonds => "Red",
-            Suit::Spades | Suit::Clubs => "Black",
+            Suit::Hearts | Suit::Diamonds => "🔴",
+            Suit::Spades | Suit::Clubs => "⚫️",
         }
     }
 
@@ -60,16 +60,16 @@ impl Rank {
     pub fn from_value(value: u8) -> Option<Self> {
         Rank::iter().nth((value - 1) as usize)
     }
-    pub fn next(self) -> Option<Self> {
+    pub fn next(&self) -> Option<Self> {
         Rank::from_value(self.value() + 1)
     }
 
     pub fn to_human(self) -> String {
         match self {
-            Rank::Ace => "A".to_owned(),
-            Rank::Jack => "J".to_owned(),
-            Rank::Queen => "Q".to_owned(),
-            Rank::King => "K".to_owned(),
+            Rank::Ace => "A".to_string(),
+            Rank::Jack => "J".to_string(),
+            Rank::Queen => "Q".to_string(),
+            Rank::King => "K".to_string(),
             number_rank => number_rank.value().to_string(),
         }
     }
