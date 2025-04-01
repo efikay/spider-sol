@@ -114,6 +114,7 @@ mod tests {
     fn should_pop_many() {
         let mut stack = Stack::from_iter([1, 2, 3, 4, 5]);
 
+        assert_eq!(stack.pop_many(0), vec![]);
         assert_eq!(stack.pop_many(3), vec![5, 4, 3]);
         assert_eq!(stack.len(), 2);
     }
