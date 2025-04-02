@@ -186,7 +186,7 @@ mod tests {
     }
 
     #[test]
-    fn should_correctly_extract_complete_sequence() {
+    fn should_extract_complete_sequence() {
         let mut pile = CardPileV2::from_cards(
             Card::make_complete_sequence_of_opened(Suit::Diamonds)
                 .iter()
@@ -217,6 +217,12 @@ mod tests {
 
         assert_eq!(pile.try_extract_complete_sequence(), Some(expected_seq));
         assert!(pile.is_empty());
+    }
+
+    fn should_not_extract_mixed_state_complete_sequence() {
+        todo!(
+            "Make test for complete sequence that starts with closed cards (and update the code to make it pass)"
+        )
     }
 
     #[test]
