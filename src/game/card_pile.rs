@@ -82,12 +82,5 @@ impl CardPile {
         }
     }
 
-    fn cards(&self) -> Vec<Card> {
-        self.sequences
-            .iter()
-            .flat_map(|seq| seq.cards.clone())
-            .collect()
-    }
-
-    // TODO: Pile logic + move-out/move-in logic and full_sequence detection
+    // TODO: Pile logic + move-out/move-in logic
 }

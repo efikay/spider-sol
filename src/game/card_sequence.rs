@@ -7,7 +7,7 @@ use core::fmt;
  * Debatable. Maybe I'll refuse to use this in future.
  * Looks-like overhead maybe.
  */
-use crate::game::core::{Card, FULL_SEQUENCE_LENGTH, Suit};
+use crate::game::core::{Card, COMPLETE_SEQUENCE_LENGTH, Suit};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CardSequence {
@@ -59,7 +59,7 @@ impl CardSequence {
     }
 
     pub fn is_complete(&self) -> bool {
-        self.cards.len() == FULL_SEQUENCE_LENGTH
+        self.cards.len() == COMPLETE_SEQUENCE_LENGTH
     }
 
     pub fn suit(&self) -> Suit {
