@@ -77,6 +77,13 @@ impl<T: std::clone::Clone> Stack<T> {
         self.items.last()
     }
 
+    pub fn peek_nth(&self, index: usize) -> Option<&T> {
+        match self.items.len().checked_sub(index + 1) {
+            Some(peek_index) => self.items.get(peek_index),
+            None => None,
+        }
+    }
+
     pub fn len(&self) -> usize {
         self.items.len()
     }
@@ -117,6 +124,25 @@ mod tests {
         assert_eq!(stack.pop_many(0), vec![]);
         assert_eq!(stack.pop_many(3), vec![5, 4, 3]);
         assert_eq!(stack.len(), 2);
+    }
+
+    #[test]
+    fn should_peek() {
+        let stack = Stack::from_iter([1, 2, 3, 4, 5]);
+
+        assert_eq!(stack.peek().unwrap().clone(), 5);
+        assert_eq!(stack.len(), 5);
+    }
+
+    #[test]
+    fn should_peek_nth() {
+        let stack = Stack::from_iter([1, 2, 3, 4, 5]);
+
+        assert_eq!(stack.peek_nth(0).unwrap().clone(), 5);
+        assert_eq!(stack.peek_nth(1).unwrap().clone(), 4);
+        assert_eq!(stack.peek_nth(2).unwrap().clone(), 3);
+        assert!(stack.peek_nth(10).is_none());
+        assert_eq!(stack.len(), 5);
     }
 
     #[test]
