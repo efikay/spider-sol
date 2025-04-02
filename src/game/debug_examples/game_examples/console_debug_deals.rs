@@ -5,7 +5,7 @@ use crate::game::{
     card_stock::{CardStock, InitialCards},
     card_stock_trait::ICardStock,
     core::{Card, GameMode, PILES_AMOUNT, Rank, Suit},
-    debug_examples::mock_parts::SameCardIncDealStock,
+    debug_examples::mock_parts::SameCardDecDealStock,
     game_engine::GameEngine,
     game_tableau::GameTableau,
 };
@@ -15,19 +15,19 @@ pub fn console_debug_deals() {
         GameTableau::new(InitialCards {
             face_down_cards: vec![],
             face_up_cards: vec![
-                Card::new_opened(Rank::Ace, Suit::Spades),
-                Card::new_opened(Rank::Ace, Suit::Spades),
-                Card::new_opened(Rank::Ace, Suit::Spades),
-                Card::new_opened(Rank::Ace, Suit::Spades),
-                Card::new_opened(Rank::Ace, Suit::Spades),
-                Card::new_opened(Rank::Ace, Suit::Spades),
-                Card::new_opened(Rank::Ace, Suit::Spades),
-                Card::new_opened(Rank::Ace, Suit::Spades),
-                Card::new_opened(Rank::Ace, Suit::Spades),
-                Card::new_opened(Rank::Ace, Suit::Spades),
+                Card::new_opened(Rank::King, Suit::Spades),
+                Card::new_opened(Rank::King, Suit::Spades),
+                Card::new_opened(Rank::King, Suit::Spades),
+                Card::new_opened(Rank::King, Suit::Spades),
+                Card::new_opened(Rank::King, Suit::Spades),
+                Card::new_opened(Rank::King, Suit::Spades),
+                Card::new_opened(Rank::King, Suit::Spades),
+                Card::new_opened(Rank::King, Suit::Spades),
+                Card::new_opened(Rank::King, Suit::Spades),
+                Card::new_opened(Rank::King, Suit::Spades),
             ],
         }),
-        SameCardIncDealStock::new(Rank::Two),
+        SameCardDecDealStock::new(Rank::Queen),
     );
 
     println!("Game started (aces start, same card++ deals)");

@@ -15,6 +15,12 @@ pub struct CardPileV2 {
     index: usize,
 }
 
+impl PartialEq for CardPileV2 {
+    fn eq(&self, other: &Self) -> bool {
+        self.index == other.index
+    }
+}
+
 impl CardPileV2 {
     pub fn init_piles() -> [CardPileV2; PILES_AMOUNT] {
         std::array::from_fn(|index| CardPileV2::new(index))
@@ -51,7 +57,7 @@ impl CardPileV2 {
         let cards = self.playable_cards();
 
         if cards.len() == COMPLETE_SEQUENCE_LENGTH {
-            let full_seq_range = self.len() - (COMPLETE_SEQUENCE_LENGTH + 1)..;
+            let full_seq_range = self.len() - (COMPLETE_SEQUENCE_LENGTH)..;
             let full_seq_cards = self.cards.drain(full_seq_range).collect::<Vec<Card>>();
 
             let std_cards: [Card; COMPLETE_SEQUENCE_LENGTH] = match full_seq_cards.try_into() {
@@ -97,7 +103,7 @@ impl CardPileV2 {
         }
     }
 
-    pub fn can_move_to(&self, other: &CardPileV2) -> bool {
+    fn can_move_to(&self, other: &CardPileV2) -> bool {
         let cards = self.playable_cards();
         let other_cards = other.playable_cards();
 
@@ -180,7 +186,41 @@ mod tests {
     }
 
     #[test]
-    fn should_group_into_sequences_right() {
+    fn should_correctly_extract_complete_sequence() {
+        let mut pile = CardPileV2::from_cards(
+            Card::make_complete_sequence_of_opened(Suit::Diamonds)
+                .iter()
+                .rev()
+                .cloned()
+                .collect(),
+            0,
+        );
+
+        let expected_seq = [
+            Card::new_opened(Rank::King, Suit::Diamonds),
+            Card::new_opened(Rank::Queen, Suit::Diamonds),
+            Card::new_opened(Rank::Jack, Suit::Diamonds),
+            Card::new_opened(Rank::Ten, Suit::Diamonds),
+            Card::new_opened(Rank::Nine, Suit::Diamonds),
+            Card::new_opened(Rank::Eight, Suit::Diamonds),
+            Card::new_opened(Rank::Seven, Suit::Diamonds),
+            Card::new_opened(Rank::Six, Suit::Diamonds),
+            Card::new_opened(Rank::Five, Suit::Diamonds),
+            Card::new_opened(Rank::Four, Suit::Diamonds),
+            Card::new_opened(Rank::Three, Suit::Diamonds),
+            Card::new_opened(Rank::Two, Suit::Diamonds),
+            Card::new_opened(Rank::Ace, Suit::Diamonds),
+        ];
+
+        assert_eq!(pile.len(), COMPLETE_SEQUENCE_LENGTH);
+        assert_eq!(pile.seqs().len(), 1);
+
+        assert_eq!(pile.try_extract_complete_sequence(), Some(expected_seq));
+        assert!(pile.is_empty());
+    }
+
+    #[test]
+    fn should_correctly_group_into_sequences() {
         let mut pile = CardPileV2::new(0);
         pile.add_start_card(Card::new(Rank::King, Suit::Spades));
         pile.add_start_card(Card::new(Rank::Queen, Suit::Spades));

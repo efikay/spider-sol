@@ -1,16 +1,18 @@
 #![allow(dead_code)]
 
+use std::cmp::Ordering;
+
 type SrcCardIndex = usize;
 type SrcPileIndex = usize;
 type DestPileIndex = usize;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum CardMoveType {
     OnEmptyPile(SrcCardIndex),
     OnCardPile,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CardMove {
     move_type: CardMoveType,
     src: SrcPileIndex,
@@ -59,6 +61,34 @@ impl CardMove {
         match self.move_type {
             CardMoveType::OnCardPile => true,
             _ => false,
+        }
+    }
+}
+
+/// -------- Ordering -------- ///
+impl PartialOrd for CardMove {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for CardMove {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match self.src.cmp(&other.src) {
+            Ordering::Equal => {
+                match self.dest.cmp(&other.dest) {
+                    Ordering::Equal => {
+                        match (self.move_type, other.move_type) {
+                            (CardMoveType::OnEmptyPile(a), CardMoveType::OnEmptyPile(b)) => a.cmp(&b),
+                            (CardMoveType::OnCardPile, CardMoveType::OnCardPile) => Ordering::Equal,
+                            (CardMoveType::OnEmptyPile(_), CardMoveType::OnCardPile) => Ordering::Less,
+                            (CardMoveType::OnCardPile, CardMoveType::OnEmptyPile(_)) => Ordering::Greater,
+                        }
+                    }
+                    ordering => ordering,
+                }
+            }
+            ordering => ordering,
         }
     }
 }

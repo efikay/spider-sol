@@ -58,10 +58,20 @@ impl Rank {
         self as u8
     }
     pub fn from_value(value: u8) -> Option<Self> {
-        Rank::iter().nth((value - 1) as usize)
+        if value > 0 {
+            Rank::iter().nth((value - 1) as usize)
+        } else {
+            None
+        }
     }
     pub fn next(&self) -> Option<Self> {
         Rank::from_value(self.value() + 1)
+    }
+    pub fn prev(&self) -> Option<Self> {
+        match self.value().checked_sub(1) {
+            Some(prev_value) => Rank::from_value(prev_value),
+            None => None,
+        }
     }
 
     pub fn to_human(self) -> String {

@@ -72,7 +72,10 @@ impl Card {
         other.is_opened && self.rank.value() + 1 == other.rank.value()
     }
 
-    pub fn make_full_sequence_of(suit: Suit) -> Vec<Card> {
+    pub fn make_complete_sequence_of(suit: Suit) -> Vec<Card> {
         Rank::iter().map(|r| Card::new(r, suit)).collect()
+    }
+    pub fn make_complete_sequence_of_opened(suit: Suit) -> Vec<Card> {
+        Rank::iter().map(|r| Card::new_opened(r, suit)).collect()
     }
 }

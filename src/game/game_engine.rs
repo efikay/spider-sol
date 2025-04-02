@@ -2,15 +2,17 @@
 
 use core::fmt;
 
-use crate::game::{
-    card_sequence::CardSequence, card_stock_trait::ICardStock, data_types::AvailableMove,
-    game_tableau::GameTableau,
+use crate::game::{card_stock_trait::ICardStock, game_tableau::GameTableau};
+
+use super::{
+    core::{COMPLETE_SEQUENCE_LENGTH, Card},
+    v2::CardMove,
 };
 
 pub struct GameEngine<CardStockT: ICardStock> {
     tableau: GameTableau,
     stock: CardStockT,
-    complete_sequences: Vec<CardSequence>,
+    complete_sequences: Vec<[Card; COMPLETE_SEQUENCE_LENGTH]>,
 }
 
 impl<CardStockT: ICardStock + std::fmt::Display> fmt::Display for GameEngine<CardStockT> {
@@ -21,10 +23,7 @@ impl<CardStockT: ICardStock + std::fmt::Display> fmt::Display for GameEngine<Car
         writeln!(f, "Complete sequences: {}", self.complete_sequences.len())?;
         writeln!(f, "Deals left: {}", self.stock.deals_left())?;
         writeln!(f, "Won?: {}", self.is_won())?;
-        writeln!(f, "Available moves:")?;
-        for available_move in self.get_available_moves() {
-            writeln!(f, "\t{}", available_move)?;
-        }
+        writeln!(f, "Available moves: (TODO fmt)")?;
         writeln!(f, "</GameEngine>")
     }
 }
@@ -59,7 +58,7 @@ impl<CardStockT: ICardStock> GameEngine<CardStockT> {
         }
     }
 
-    pub fn get_available_moves(&self) -> Vec<AvailableMove> {
+    pub fn get_available_moves(&self) -> Vec<CardMove> {
         self.tableau.calculate_available_moves()
     }
 
