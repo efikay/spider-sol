@@ -2,15 +2,14 @@
 
 use crossterm::event::{Event, KeyCode, read};
 
-use crate::game::{
+use crate::{debug_examples::mock_parts::SameCardDecDealStock, game::{
     card_deck::CardDeck,
     card_stock::{CardStock, InitialCards},
     card_stock_trait::ICardStock,
-    core::{Card, GameMode, PILES_AMOUNT, Rank, Suit},
-    debug_examples::mock_parts::SameCardDecDealStock,
+    core::{Card, GameMode, Rank, Suit, PILES_AMOUNT},
     game_engine::GameEngine,
     game_tableau::GameTableau,
-};
+}};
 
 pub fn console_debug_deals() {
     let mut game = GameEngine::from_tableau_and_stock(

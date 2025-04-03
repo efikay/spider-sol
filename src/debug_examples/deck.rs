@@ -5,7 +5,7 @@ use std::io::{self, Write};
 
 use crossterm::event::{Event, KeyCode, read};
 
-use crate::game::debug_examples::helpers::wait_for_enter_press;
+use crate::debug_examples::helpers::wait_for_enter_press;
 use crate::game::{card_deck::CardDeck, core::GameMode};
 
 fn wait_for_game_mode() -> GameMode {
