@@ -62,6 +62,10 @@ impl<CardStockT: ICardStock> GameEngine<CardStockT> {
         self.tableau.calculate_available_moves()
     }
 
+    pub fn perform_move(&mut self, card_move: CardMove) -> Result<(), ()> {
+        self.tableau.perform_move(card_move)
+    }
+
     pub fn search_and_update_complete_sequences(&mut self) {
         self.complete_sequences
             .extend(self.tableau.extract_complete_sequences());

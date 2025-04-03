@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use core::fmt;
 use std::cmp::Ordering;
 
 type SrcCardIndex = usize;
@@ -7,7 +8,7 @@ type SrcPileIndex = usize;
 type DestPileIndex = usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum CardMoveType {
+pub enum CardMoveType {
     OnEmptyPile(SrcCardIndex),
     OnCardPile,
 }
@@ -50,17 +51,28 @@ impl CardMove {
             CardMoveType::OnCardPile => None,
         }
     }
-
-    pub fn is_pile_move(&self) -> bool {
-        match self.move_type {
-            CardMoveType::OnEmptyPile(_) => true,
-            _ => false,
-        }
+    pub fn move_type(&self) -> CardMoveType {
+        self.move_type
     }
-    pub fn is_card_move(&self) -> bool {
+    pub fn is_on_card_pile_move(&self) -> bool {
+        self.move_type == CardMoveType::OnCardPile
+    }
+}
+
+/// -------- Formatting -------- ///
+impl fmt::Display for CardMove {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self.move_type {
-            CardMoveType::OnCardPile => true,
-            _ => false,
+            CardMoveType::OnEmptyPile(card_index) => {
+                write!(
+                    f,
+                    "EmptyPileMove {{ {}->{}, card_idx={} }}",
+                    self.src, self.dest, card_index
+                )
+            }
+            CardMoveType::OnCardPile => {
+                write!(f, "CardPileMove {{ {}->{} }}", self.src, self.dest)
+            }
         }
     }
 }
@@ -75,19 +87,15 @@ impl PartialOrd for CardMove {
 impl Ord for CardMove {
     fn cmp(&self, other: &Self) -> Ordering {
         match self.src.cmp(&other.src) {
-            Ordering::Equal => {
-                match self.dest.cmp(&other.dest) {
-                    Ordering::Equal => {
-                        match (self.move_type, other.move_type) {
-                            (CardMoveType::OnEmptyPile(a), CardMoveType::OnEmptyPile(b)) => a.cmp(&b),
-                            (CardMoveType::OnCardPile, CardMoveType::OnCardPile) => Ordering::Equal,
-                            (CardMoveType::OnEmptyPile(_), CardMoveType::OnCardPile) => Ordering::Less,
-                            (CardMoveType::OnCardPile, CardMoveType::OnEmptyPile(_)) => Ordering::Greater,
-                        }
-                    }
-                    ordering => ordering,
-                }
-            }
+            Ordering::Equal => match self.dest.cmp(&other.dest) {
+                Ordering::Equal => match (self.move_type, other.move_type) {
+                    (CardMoveType::OnEmptyPile(a), CardMoveType::OnEmptyPile(b)) => a.cmp(&b),
+                    (CardMoveType::OnCardPile, CardMoveType::OnCardPile) => Ordering::Equal,
+                    (CardMoveType::OnEmptyPile(_), CardMoveType::OnCardPile) => Ordering::Less,
+                    (CardMoveType::OnCardPile, CardMoveType::OnEmptyPile(_)) => Ordering::Greater,
+                },
+                ordering => ordering,
+            },
             ordering => ordering,
         }
     }

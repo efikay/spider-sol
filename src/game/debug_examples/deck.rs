@@ -5,6 +5,7 @@ use std::io::{self, Write};
 
 use crossterm::event::{Event, KeyCode, read};
 
+use crate::game::debug_examples::helpers::wait_for_enter_press;
 use crate::game::{card_deck::CardDeck, core::GameMode};
 
 fn wait_for_game_mode() -> GameMode {
@@ -25,18 +26,6 @@ fn wait_for_game_mode() -> GameMode {
     }
 }
 
-fn wait_for_cards_command() {
-    println!("Press [ENTER] key to take some cards...");
-
-    loop {
-        if let Ok(Event::Key(event)) = read() {
-            if event.code == KeyCode::Enter {
-                break;
-            }
-        }
-    }
-}
-
 pub fn console_debug_deck() {
     let mut deck = CardDeck::new(wait_for_game_mode());
     let _ = read();
@@ -44,7 +33,7 @@ pub fn console_debug_deck() {
 
     while !deck.is_empty() {
         println!("Deck has {} cards left", deck.len());
-        wait_for_cards_command();
+        wait_for_enter_press(&String::from("Press [ENTER] key to take some cards..."));
 
         let some_cards = deck.take_cards(15);
 

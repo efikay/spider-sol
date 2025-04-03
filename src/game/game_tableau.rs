@@ -6,7 +6,7 @@ use crate::game::{card_stock::InitialCards, core::Card};
 
 use super::{
     core::{COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT},
-    v2::{CardMove, CardPileV2},
+    v2::{CardMove, CardMoveType, CardPileV2},
 };
 
 pub struct GameTableau {
@@ -88,7 +88,20 @@ impl GameTableau {
         available_moves
     }
 
-    // TODO: Pile move logic
+    pub fn perform_move(&mut self, card_move: CardMove) -> Result<(), ()> {
+        let src_pile: &mut CardPileV2 =
+            unsafe { &mut *(&mut self.piles[card_move.src_pile()] as *mut _) };
+        let dest_pile: &mut CardPileV2 = unsafe { &mut *(&mut self.piles[card_move.dest_pile()] as *mut _) };
+
+        match card_move.move_type() {
+            CardMoveType::OnEmptyPile(src_card) => {
+                src_pile.perform_empty_pile_move(dest_pile, src_card)
+            }
+            CardMoveType::OnCardPile => {
+                src_pile.perform_card_pile_move(dest_pile)
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -149,7 +162,7 @@ mod tests {
         let result_card_moves: Vec<CardMove> = tableau
             .calculate_available_moves()
             .iter()
-            .filter(|m| m.is_card_move())
+            .filter(|m| m.is_on_card_pile_move())
             .cloned()
             .collect();
 
@@ -187,7 +200,7 @@ mod tests {
         let result_card_moves: Vec<CardMove> = tableau
             .calculate_available_moves()
             .iter()
-            .filter(|m| m.is_card_move())
+            .filter(|m| m.is_on_card_pile_move())
             .cloned()
             .collect();
 
