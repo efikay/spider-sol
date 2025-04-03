@@ -2,8 +2,13 @@
 
 mod card;
 mod constants;
-mod core_types;
+mod game_mode;
+mod rank;
+mod suit;
+
+pub use constants::{COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT};
 
 pub use card::Card;
-pub use constants::{COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT};
-pub use core_types::{GameMode, Rank, Suit};
+pub use game_mode::GameMode;
+pub use rank::Rank;
+pub use suit::Suit;
