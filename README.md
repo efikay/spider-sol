@@ -29,6 +29,9 @@ Status: In development 🚧 (game engine is ready)
 
 ## Ideas
 - [ ] help window (+shortcut)
+- [ ] full game configuration
+- [ ] cli params (use cli lib)
+- [ ] (auto-?)save game / resume game
 - [ ] hjkl
 - [ ] Auto-select top of last column stack item
 - [ ] Ability to auto-move cards to another column (as option)
