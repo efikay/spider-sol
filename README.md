@@ -26,6 +26,7 @@ Status: In development 🚧 (game engine is ready)
 4. (todo) Advanced TUI
 5. (todo) Keyboard shortcuts, etc
 6. (todo) QoL features, auto-features
+7. (todo) Realize some ideas that are nice
 
 ## Ideas
 - [ ] help window (+shortcut)
