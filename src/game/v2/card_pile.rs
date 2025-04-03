@@ -71,8 +71,19 @@ impl CardPileV2 {
         }
     }
 
-    pub fn perform_card_move(&mut self, card_move: &CardMove, target_pile: &CardPileV2) {
-        todo!()
+    pub fn perform_empty_pile_move(
+        &mut self,
+        target_pile: &mut CardPileV2,
+        card_from: usize,
+    ) -> Result<(), ()> {
+        assert!(target_pile.is_empty());
+
+        for card in &self.extract_playable_cards_from(card_from) {
+            // TODO: Add specific method for this
+            target_pile.add_start_card(*card);
+        }
+
+        Ok(())
     }
 
     pub fn calc_moves_to(&self, other: &CardPileV2) -> Vec<CardMove> {
@@ -119,6 +130,16 @@ impl CardPileV2 {
                 .iter()
                 .any(|other_card| card.can_move_on(other_card))
         })
+    }
+
+    fn extract_playable_cards_from(&mut self, index: usize) -> Vec<Card> {
+        let card_index = self.non_playable_cards().len() + index;
+
+        self.cards.drain(card_index..).collect()
+    }
+
+    fn non_playable_cards(&self) -> &[Card] {
+        &self.cards[..self.cards.len() - self.playable_cards().len()]
     }
 
     fn playable_cards(&self) -> &[Card] {
@@ -223,6 +244,97 @@ mod tests {
         todo!(
             "Make test for complete sequence that starts with closed cards (and update the code to make it pass)"
         )
+    }
+
+    #[test]
+    fn should_move_correctly() {
+        let mut pile = CardPileV2::from_cards(
+            vec![
+                Card::new_opened(Rank::Two, Suit::Spades),
+                Card::new_opened(Rank::Ace, Suit::Spades),
+                //
+                Card::new_opened(Rank::Six, Suit::Spades),
+                Card::new_opened(Rank::Five, Suit::Spades),
+                Card::new_opened(Rank::Four, Suit::Spades),
+                Card::new_opened(Rank::Three, Suit::Spades),
+                Card::new_opened(Rank::Two, Suit::Spades),
+                Card::new_opened(Rank::Ace, Suit::Spades),
+            ],
+            0,
+        );
+        let mut other_pile = CardPileV2::new(1);
+
+        assert_eq!(pile.seqs().len(), 2);
+
+        assert_eq!(pile.perform_empty_pile_move(&mut other_pile, 0), Ok(()));
+        assert_eq!(pile.seqs().len(), 1);
+        assert_eq!(
+            pile.cards,
+            vec![
+                Card::new_opened(Rank::Two, Suit::Spades),
+                Card::new_opened(Rank::Ace, Suit::Spades),
+            ]
+        );
+        assert_eq!(
+            other_pile.cards,
+            vec![
+                Card::new_opened(Rank::Six, Suit::Spades),
+                Card::new_opened(Rank::Five, Suit::Spades),
+                Card::new_opened(Rank::Four, Suit::Spades),
+                Card::new_opened(Rank::Three, Suit::Spades),
+                Card::new_opened(Rank::Two, Suit::Spades),
+                Card::new_opened(Rank::Ace, Suit::Spades),
+            ]
+        );
+
+        assert_eq!(pile.perform_empty_pile_move(&mut CardPileV2::new(2), 0), Ok(()));
+        assert_eq!(pile.len(), 0);
+    }
+
+    #[test]
+    fn should_move_correctly2() {
+        let mut pile = CardPileV2::from_cards(
+            vec![
+                Card::new_opened(Rank::Two, Suit::Spades),
+                Card::new_opened(Rank::Ace, Suit::Spades),
+                //
+                Card::new_opened(Rank::Six, Suit::Spades),
+                Card::new_opened(Rank::Five, Suit::Spades),
+                Card::new_opened(Rank::Four, Suit::Spades),
+                Card::new_opened(Rank::Three, Suit::Spades),
+                Card::new_opened(Rank::Two, Suit::Spades),
+                Card::new_opened(Rank::Ace, Suit::Spades),
+            ],
+            0,
+        );
+        let mut other_pile = CardPileV2::new(1);
+
+        assert_eq!(pile.seqs().len(), 2);
+
+        assert_eq!(pile.perform_empty_pile_move(&mut other_pile, 3), Ok(()));
+        assert_eq!(pile.seqs().len(), 2);
+        assert_eq!(
+            pile.cards,
+            vec![
+                Card::new_opened(Rank::Two, Suit::Spades),
+                Card::new_opened(Rank::Ace, Suit::Spades),
+                //
+                Card::new_opened(Rank::Six, Suit::Spades),
+                Card::new_opened(Rank::Five, Suit::Spades),
+                Card::new_opened(Rank::Four, Suit::Spades),
+            ]
+        );
+        assert_eq!(
+            other_pile.cards,
+            vec![
+                Card::new_opened(Rank::Three, Suit::Spades),
+                Card::new_opened(Rank::Two, Suit::Spades),
+                Card::new_opened(Rank::Ace, Suit::Spades),
+            ]
+        );
+
+        assert_eq!(pile.perform_empty_pile_move(&mut CardPileV2::new(2), 0), Ok(()));
+        assert_eq!(pile.seqs().len(), 1);
     }
 
     #[test]
