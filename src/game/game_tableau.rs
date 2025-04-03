@@ -107,7 +107,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_available_moves_simple() {
+    fn should_calculate_moves_simple_case() {
         let tableau = GameTableau::new(vec![
             Card::new_opened(Rank::Ace, Suit::Spades),
             Card::new_opened(Rank::Two, Suit::Spades),
@@ -138,7 +138,7 @@ mod tests {
     }
 
     #[test]
-    fn test_available_card_moves_simple() {
+    fn should_calculate_single_card_pile_move() {
         let tableau = GameTableau::new(vec![
             Card::new_opened(Rank::Two, Suit::Hearts),
             Card::new_opened(Rank::Three, Suit::Hearts),
@@ -157,7 +157,7 @@ mod tests {
     }
 
     #[test]
-    fn test_available_card_moves_harder() {
+    fn should_calculate_tricky_card_pile_moves() {
         let tableau = GameTableau::from_piles([
             CardPileV2::from_cards(
                 vec![
