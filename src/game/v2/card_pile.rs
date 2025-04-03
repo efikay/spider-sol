@@ -86,6 +86,30 @@ impl CardPileV2 {
         Ok(())
     }
 
+    pub fn perform_card_pile_move(&mut self, target_pile: &mut CardPileV2) -> Result<(), ()> {
+        let cards = self.playable_cards();
+        let other_card = target_pile.playable_cards().last();
+
+        if let Some(other_tail_card) = other_card {
+            if let Some((card_from, _)) = cards
+                .iter()
+                .enumerate()
+                .find(|(_, card)| card.can_move_on(other_tail_card))
+            {
+                for card in &self.extract_playable_cards_from(card_from) {
+                    // TODO: Add specific method for this
+                    target_pile.add_start_card(*card);
+                }
+
+                Ok(())
+            } else {
+                Err(())
+            }
+        } else {
+            Err(())
+        }
+    }
+
     pub fn calc_moves_to(&self, other: &CardPileV2) -> Vec<CardMove> {
         let cards = self.playable_cards();
         let other_cards = other.playable_cards();
@@ -247,7 +271,7 @@ mod tests {
     }
 
     #[test]
-    fn should_move_correctly() {
+    fn should_move_to_empty_pile_correctly() {
         let mut pile = CardPileV2::from_cards(
             vec![
                 Card::new_opened(Rank::Two, Suit::Spades),
@@ -287,12 +311,15 @@ mod tests {
             ]
         );
 
-        assert_eq!(pile.perform_empty_pile_move(&mut CardPileV2::new(2), 0), Ok(()));
+        assert_eq!(
+            pile.perform_empty_pile_move(&mut CardPileV2::new(2), 0),
+            Ok(())
+        );
         assert_eq!(pile.len(), 0);
     }
 
     #[test]
-    fn should_move_correctly2() {
+    fn should_move_to_empty_pile_correctly2() {
         let mut pile = CardPileV2::from_cards(
             vec![
                 Card::new_opened(Rank::Two, Suit::Spades),
@@ -333,8 +360,94 @@ mod tests {
             ]
         );
 
-        assert_eq!(pile.perform_empty_pile_move(&mut CardPileV2::new(2), 0), Ok(()));
+        assert_eq!(
+            pile.perform_empty_pile_move(&mut CardPileV2::new(2), 0),
+            Ok(())
+        );
         assert_eq!(pile.seqs().len(), 1);
+    }
+
+    #[test]
+    fn should_move_to_card_pile_correctly() {
+        let mut pile = CardPileV2::from_cards(
+            vec![
+                Card::new_opened(Rank::King, Suit::Hearts),
+                Card::new_opened(Rank::Queen, Suit::Hearts),
+                Card::new_opened(Rank::Jack, Suit::Hearts),
+                //
+                Card::new_opened(Rank::Eight, Suit::Hearts),
+                Card::new_opened(Rank::Seven, Suit::Hearts),
+                Card::new_opened(Rank::Six, Suit::Hearts),
+                Card::new_opened(Rank::Five, Suit::Hearts),
+                Card::new_opened(Rank::Four, Suit::Hearts),
+                Card::new_opened(Rank::Three, Suit::Hearts),
+            ],
+            0,
+        );
+        let mut other_pile = CardPileV2::from_cards(
+            vec![
+                Card::new_opened(Rank::Eight, Suit::Hearts),
+                Card::new_opened(Rank::Seven, Suit::Hearts),
+                Card::new_opened(Rank::Six, Suit::Hearts),
+            ],
+            0,
+        );
+
+        assert_eq!(pile.seqs().len(), 2);
+
+        assert_eq!(pile.perform_card_pile_move(&mut other_pile), Ok(()));
+        assert_eq!(pile.seqs().len(), 2);
+        assert_eq!(other_pile.seqs().len(), 1);
+        assert_eq!(
+            pile.cards,
+            vec![
+                Card::new_opened(Rank::King, Suit::Hearts),
+                Card::new_opened(Rank::Queen, Suit::Hearts),
+                Card::new_opened(Rank::Jack, Suit::Hearts),
+                //
+                Card::new_opened(Rank::Eight, Suit::Hearts),
+                Card::new_opened(Rank::Seven, Suit::Hearts),
+                Card::new_opened(Rank::Six, Suit::Hearts),
+            ]
+        );
+        assert_eq!(
+            other_pile.cards,
+            vec![
+                Card::new_opened(Rank::Eight, Suit::Hearts),
+                Card::new_opened(Rank::Seven, Suit::Hearts),
+                Card::new_opened(Rank::Six, Suit::Hearts),
+                Card::new_opened(Rank::Five, Suit::Hearts),
+                Card::new_opened(Rank::Four, Suit::Hearts),
+                Card::new_opened(Rank::Three, Suit::Hearts),
+            ]
+        );
+
+        assert_eq!(other_pile.perform_card_pile_move(&mut pile), Ok(()));
+        assert_eq!(pile.seqs().len(), 2);
+        assert_eq!(other_pile.seqs().len(), 1);
+        assert_eq!(
+            pile.cards,
+            vec![
+                Card::new_opened(Rank::King, Suit::Hearts),
+                Card::new_opened(Rank::Queen, Suit::Hearts),
+                Card::new_opened(Rank::Jack, Suit::Hearts),
+                //
+                Card::new_opened(Rank::Eight, Suit::Hearts),
+                Card::new_opened(Rank::Seven, Suit::Hearts),
+                Card::new_opened(Rank::Six, Suit::Hearts),
+                Card::new_opened(Rank::Five, Suit::Hearts),
+                Card::new_opened(Rank::Four, Suit::Hearts),
+                Card::new_opened(Rank::Three, Suit::Hearts),
+            ]
+        );
+        assert_eq!(
+            other_pile.cards,
+            vec![
+                Card::new_opened(Rank::Eight, Suit::Hearts),
+                Card::new_opened(Rank::Seven, Suit::Hearts),
+                Card::new_opened(Rank::Six, Suit::Hearts),
+            ]
+        );
     }
 
     #[test]
@@ -392,5 +505,61 @@ mod tests {
             .collect();
 
         assert_eq!(expected_sequences, sequences);
+    }
+
+    #[test]
+    fn should_correctly_group_mixed_suit_cards_into_sequences() {
+        let pile = CardPileV2::from_cards(
+            vec![
+                Card::new_opened(Rank::King, Suit::Spades),
+                Card::new_opened(Rank::Queen, Suit::Diamonds),
+                Card::new_opened(Rank::Jack, Suit::Spades),
+                Card::new_opened(Rank::Ten, Suit::Spades),
+                Card::new_opened(Rank::Nine, Suit::Hearts),
+                Card::new_opened(Rank::Eight, Suit::Hearts),
+                Card::new_opened(Rank::Seven, Suit::Spades),
+                Card::new_opened(Rank::Six, Suit::Clubs),
+                Card::new_opened(Rank::Five, Suit::Spades),
+                Card::new_opened(Rank::Four, Suit::Clubs),
+                Card::new_opened(Rank::Three, Suit::Spades),
+                Card::new_opened(Rank::Two, Suit::Spades),
+                Card::new_opened(Rank::Ace, Suit::Diamonds),
+            ],
+            0,
+        );
+
+        let expected_sequences: Vec<Vec<Card>> = vec![
+            vec![Card::new_opened(Rank::King, Suit::Spades)],
+            vec![Card::new_opened(Rank::Queen, Suit::Diamonds)],
+            vec![
+                Card::new_opened(Rank::Jack, Suit::Spades),
+                Card::new_opened(Rank::Ten, Suit::Spades),
+            ],
+            vec![
+                Card::new_opened(Rank::Nine, Suit::Hearts),
+                Card::new_opened(Rank::Eight, Suit::Hearts),
+            ],
+            vec![Card::new_opened(Rank::Seven, Suit::Spades)],
+            vec![Card::new_opened(Rank::Six, Suit::Clubs)],
+            vec![Card::new_opened(Rank::Five, Suit::Spades)],
+            vec![Card::new_opened(Rank::Four, Suit::Clubs)],
+            vec![
+                Card::new_opened(Rank::Three, Suit::Spades),
+                Card::new_opened(Rank::Two, Suit::Spades),
+            ],
+            vec![Card::new_opened(Rank::Ace, Suit::Diamonds)],
+        ];
+
+        let sequences: Vec<Vec<Card>> = pile
+            .seqs()
+            .iter()
+            .map(|seq| {
+                seq.iter()
+                    .map(|card| Card::from(*card))
+                    .collect::<Vec<Card>>()
+            })
+            .collect();
+
+        assert_eq!(sequences.len(), expected_sequences.len());
     }
 }
