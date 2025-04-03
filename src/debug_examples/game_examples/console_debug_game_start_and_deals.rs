@@ -4,15 +4,14 @@ use crossterm::event::{Event, KeyCode, read};
 
 use crate::game::{
     card_deck::CardDeck,
-    card_stock::{CardStock, InitialCards},
-    card_stock_trait::ICardStock,
+    card_stock::CardDeckStock,
     core::{Card, GameMode, PILES_AMOUNT, Rank, Suit},
     game_engine::GameEngine,
     game_tableau::GameTableau,
 };
 
 pub fn console_debug_game_start_and_deals() {
-    let stock = CardStock::new(CardDeck::new(GameMode::FourSuits));
+    let stock = CardDeckStock::new(CardDeck::new(GameMode::FourSuits));
     let mut game = GameEngine::new(stock);
 
     println!("Game started, FourSuits mode");

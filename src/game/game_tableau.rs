@@ -6,15 +6,15 @@ use super::{
     core::{COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT},
     v2::{CardMove, CardMoveType, CardPileV2},
 };
-use crate::game::{card_stock::InitialCards, core::Card};
+use crate::game::core::Card;
 
 pub struct GameTableau {
     piles: [CardPileV2; PILES_AMOUNT],
 }
 
 impl GameTableau {
-    pub fn new(mut initial_cards: InitialCards) -> Self {
-        let piles = GameTableau::init_piles(&mut initial_cards);
+    pub fn new(initial_cards: Vec<Card>) -> Self {
+        let piles = GameTableau::init_piles(initial_cards);
 
         Self { piles }
     }
@@ -43,17 +43,11 @@ impl GameTableau {
         complete_sequences
     }
 
-    fn init_piles(cards: &mut InitialCards) -> [CardPileV2; PILES_AMOUNT] {
+    fn init_piles(cards: Vec<Card>) -> [CardPileV2; PILES_AMOUNT] {
         let mut pile_cards = CardPileV2::init_piles();
-        let mut pile_index = 0;
 
-        cards.face_down_cards.drain(..).for_each(|card| {
-            pile_cards[pile_index].add_start_card(card);
-            pile_index = (pile_index + 1) % PILES_AMOUNT;
-        });
-        cards.face_up_cards.drain(..).for_each(|card| {
-            pile_cards[pile_index].add_start_card(card);
-            pile_index = (pile_index + 1) % PILES_AMOUNT;
+        cards.into_iter().enumerate().for_each(|(index, card)| {
+            pile_cards[index % PILES_AMOUNT].add_start_card(card);
         });
 
         pile_cards
@@ -114,14 +108,11 @@ mod tests {
 
     #[test]
     fn test_available_moves_simple() {
-        let tableau = GameTableau::new(InitialCards {
-            face_down_cards: vec![],
-            face_up_cards: vec![
-                Card::new_opened(Rank::Ace, Suit::Spades),
-                Card::new_opened(Rank::Two, Suit::Spades),
-                Card::new_opened(Rank::King, Suit::Spades),
-            ],
-        });
+        let tableau = GameTableau::new(vec![
+            Card::new_opened(Rank::Ace, Suit::Spades),
+            Card::new_opened(Rank::Two, Suit::Spades),
+            Card::new_opened(Rank::King, Suit::Spades),
+        ]);
 
         let mut expected_moves = vec![
             CardMoveBuilder::from_pile(0).to_card_pile(1).build(),
@@ -148,13 +139,10 @@ mod tests {
 
     #[test]
     fn test_available_card_moves_simple() {
-        let tableau = GameTableau::new(InitialCards {
-            face_down_cards: vec![],
-            face_up_cards: vec![
-                Card::new_opened(Rank::Two, Suit::Hearts),
-                Card::new_opened(Rank::Three, Suit::Hearts),
-            ],
-        });
+        let tableau = GameTableau::new(vec![
+            Card::new_opened(Rank::Two, Suit::Hearts),
+            Card::new_opened(Rank::Three, Suit::Hearts),
+        ]);
 
         let expected_card_moves = vec![CardMoveBuilder::from_pile(0).to_card_pile(1).build()];
 

@@ -5,9 +5,9 @@ use std::collections::HashMap;
 use crossterm::event::{Event, KeyCode, read};
 
 use crate::{
-    debug_examples::{helpers::read_stdin_as_i32, mock_parts::CardIncCycleInfiniteStock},
+    debug_examples::helpers::read_stdin_as_i32,
     game::{
-        card_stock::InitialCards,
+        card_stock::mocks::CardIncCycleInfiniteStock,
         core::{Card, Rank, Suit},
         game_engine::GameEngine,
         game_tableau::GameTableau,
@@ -16,24 +16,21 @@ use crate::{
 
 pub fn console_debug_moves() {
     let mut game = GameEngine::from_tableau_and_stock(
-        GameTableau::new(InitialCards {
-            face_down_cards: vec![],
-            face_up_cards: vec![
-                Card::new_opened(Rank::Ace, Suit::Hearts),
-                Card::new_opened(Rank::Two, Suit::Hearts),
-                Card::new_opened(Rank::Three, Suit::Hearts),
-                Card::new_opened(Rank::Four, Suit::Hearts),
-                Card::new_opened(Rank::Five, Suit::Hearts),
-                Card::new_opened(Rank::Six, Suit::Hearts),
-                Card::new_opened(Rank::Seven, Suit::Hearts),
-                Card::new_opened(Rank::Eight, Suit::Hearts),
-                Card::new_opened(Rank::Nine, Suit::Hearts),
-                Card::new_opened(Rank::Ten, Suit::Hearts),
-                Card::new_opened(Rank::Jack, Suit::Hearts),
-                Card::new_opened(Rank::Queen, Suit::Hearts),
-                Card::new_opened(Rank::King, Suit::Hearts),
-            ],
-        }),
+        GameTableau::new(vec![
+            Card::new_opened(Rank::Ace, Suit::Hearts),
+            Card::new_opened(Rank::Two, Suit::Hearts),
+            Card::new_opened(Rank::Three, Suit::Hearts),
+            Card::new_opened(Rank::Four, Suit::Hearts),
+            Card::new_opened(Rank::Five, Suit::Hearts),
+            Card::new_opened(Rank::Six, Suit::Hearts),
+            Card::new_opened(Rank::Seven, Suit::Hearts),
+            Card::new_opened(Rank::Eight, Suit::Hearts),
+            Card::new_opened(Rank::Nine, Suit::Hearts),
+            Card::new_opened(Rank::Ten, Suit::Hearts),
+            Card::new_opened(Rank::Jack, Suit::Hearts),
+            Card::new_opened(Rank::Queen, Suit::Hearts),
+            Card::new_opened(Rank::King, Suit::Hearts),
+        ]),
         CardIncCycleInfiniteStock::new(Rank::Two),
     );
 

@@ -1,8 +1,8 @@
 use std::fmt;
 
-use crate::game::card_stock::InitialCards;
+use crate::game::card_stock::ICardStock;
+use crate::game::core::Rank;
 use crate::game::core::{Card, PILES_AMOUNT, Suit};
-use crate::game::{card_stock_trait::ICardStock, core::Rank};
 
 pub struct CardIncCycleInfiniteStock {
     rank: Rank,
@@ -22,16 +22,6 @@ impl CardIncCycleInfiniteStock {
     }
 }
 
-impl fmt::Display for CardIncCycleInfiniteStock {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "CardIncCycleInfiniteStock {{ rank: {} }}",
-            self.rank.to_human()
-        )
-    }
-}
-
 impl ICardStock for CardIncCycleInfiniteStock {
     fn deals_left(&self) -> usize {
         9999
@@ -43,10 +33,18 @@ impl ICardStock for CardIncCycleInfiniteStock {
         Some(cards)
     }
 
-    fn take_initial_cards(&mut self) -> InitialCards {
-        InitialCards {
-            face_down_cards: vec![],
-            face_up_cards: (0..PILES_AMOUNT).map(|_| self.next_card()).collect(),
-        }
+    fn take_initial_cards(&mut self) -> Vec<Card> {
+        (0..PILES_AMOUNT).map(|_| self.next_card()).collect()
+    }
+}
+
+/// ---- Formatting ---- ///
+impl fmt::Display for CardIncCycleInfiniteStock {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "CardIncCycleInfiniteStock {{ rank: {} }}",
+            self.rank.to_human()
+        )
     }
 }

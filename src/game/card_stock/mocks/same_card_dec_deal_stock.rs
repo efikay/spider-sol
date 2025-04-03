@@ -1,8 +1,8 @@
 use std::fmt;
 
-use crate::game::card_stock::InitialCards;
+use crate::game::card_stock::ICardStock;
+use crate::game::core::Rank;
 use crate::game::core::{Card, PILES_AMOUNT, Suit};
-use crate::game::{card_stock_trait::ICardStock, core::Rank};
 
 pub struct SameCardDecDealStock {
     rank: Rank,
@@ -40,12 +40,9 @@ impl ICardStock for SameCardDecDealStock {
         Some(same_cards)
     }
 
-    fn take_initial_cards(&mut self) -> InitialCards {
-        InitialCards {
-            face_down_cards: vec![],
-            face_up_cards: (0..PILES_AMOUNT)
-                .map(|_| Card::new_opened(self.rank, Suit::Spades))
-                .collect(),
-        }
+    fn take_initial_cards(&mut self) -> Vec<Card> {
+        (0..PILES_AMOUNT)
+            .map(|_| Card::new_opened(self.rank, Suit::Spades))
+            .collect()
     }
 }

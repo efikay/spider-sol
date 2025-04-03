@@ -3,10 +3,11 @@
 use core::fmt;
 
 use super::{
+    card_stock::ICardStock,
     core::{COMPLETE_SEQUENCE_LENGTH, Card},
     v2::CardMove,
 };
-use crate::game::{card_stock_trait::ICardStock, game_tableau::GameTableau};
+use crate::game::game_tableau::GameTableau;
 
 pub struct GameEngine<CardStockT: ICardStock> {
     tableau: GameTableau,

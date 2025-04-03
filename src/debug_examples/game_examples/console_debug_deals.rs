@@ -2,35 +2,28 @@
 
 use crossterm::event::{Event, KeyCode, read};
 
-use crate::{
-    debug_examples::mock_parts::SameCardDecDealStock,
-    game::{
-        card_deck::CardDeck,
-        card_stock::{CardStock, InitialCards},
-        card_stock_trait::ICardStock,
-        core::{Card, GameMode, PILES_AMOUNT, Rank, Suit},
-        game_engine::GameEngine,
-        game_tableau::GameTableau,
-    },
+use crate::game::{
+    card_deck::CardDeck,
+    card_stock::{CardDeckStock, mocks::SameCardDecDealStock},
+    core::{Card, GameMode, PILES_AMOUNT, Rank, Suit},
+    game_engine::GameEngine,
+    game_tableau::GameTableau,
 };
 
 pub fn console_debug_deals() {
     let mut game = GameEngine::from_tableau_and_stock(
-        GameTableau::new(InitialCards {
-            face_down_cards: vec![],
-            face_up_cards: vec![
-                Card::new_opened(Rank::King, Suit::Spades),
-                Card::new_opened(Rank::King, Suit::Spades),
-                Card::new_opened(Rank::King, Suit::Spades),
-                Card::new_opened(Rank::King, Suit::Spades),
-                Card::new_opened(Rank::King, Suit::Spades),
-                Card::new_opened(Rank::King, Suit::Spades),
-                Card::new_opened(Rank::King, Suit::Spades),
-                Card::new_opened(Rank::King, Suit::Spades),
-                Card::new_opened(Rank::King, Suit::Spades),
-                Card::new_opened(Rank::King, Suit::Spades),
-            ],
-        }),
+        GameTableau::new(vec![
+            Card::new_opened(Rank::King, Suit::Spades),
+            Card::new_opened(Rank::King, Suit::Spades),
+            Card::new_opened(Rank::King, Suit::Spades),
+            Card::new_opened(Rank::King, Suit::Spades),
+            Card::new_opened(Rank::King, Suit::Spades),
+            Card::new_opened(Rank::King, Suit::Spades),
+            Card::new_opened(Rank::King, Suit::Spades),
+            Card::new_opened(Rank::King, Suit::Spades),
+            Card::new_opened(Rank::King, Suit::Spades),
+            Card::new_opened(Rank::King, Suit::Spades),
+        ]),
         SameCardDecDealStock::new(Rank::Queen),
     );
 
