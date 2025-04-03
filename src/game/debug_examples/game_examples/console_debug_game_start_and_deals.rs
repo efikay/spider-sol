@@ -7,7 +7,6 @@ use crate::game::{
     card_stock::{CardStock, InitialCards},
     card_stock_trait::ICardStock,
     core::{Card, GameMode, PILES_AMOUNT, Rank, Suit},
-    debug_examples::mock_parts::SameCardIncDealStock,
     game_engine::GameEngine,
     game_tableau::GameTableau,
 };

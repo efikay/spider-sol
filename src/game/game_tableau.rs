@@ -2,15 +2,15 @@
 
 use core::fmt;
 
-use crate::game::{
-    card_pile::CardPile, card_sequence::CardSequence, card_stock::InitialCards, core::Card,
-    data_types::AvailableMove,
+use crate::game::{card_stock::InitialCards, core::Card};
+
+use super::{
+    core::{COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT},
+    v2::{CardMove, CardMoveType, CardPileV2},
 };
 
-use super::core::PILES_AMOUNT;
-
 pub struct GameTableau {
-    piles: [CardPile; PILES_AMOUNT],
+    piles: [CardPileV2; PILES_AMOUNT],
 }
 
 impl fmt::Display for GameTableau {
@@ -31,7 +31,7 @@ impl GameTableau {
 
         Self { piles }
     }
-    pub fn from_piles(piles: [CardPile; PILES_AMOUNT]) -> Self {
+    pub fn from_piles(piles: [CardPileV2; PILES_AMOUNT]) -> Self {
         Self { piles }
     }
 
@@ -44,7 +44,7 @@ impl GameTableau {
             });
     }
 
-    pub fn extract_complete_sequences(&mut self) -> Vec<CardSequence> {
+    pub fn extract_complete_sequences(&mut self) -> Vec<[Card; COMPLETE_SEQUENCE_LENGTH]> {
         let mut complete_sequences = vec![];
 
         for pile in &mut self.piles {
@@ -56,8 +56,8 @@ impl GameTableau {
         complete_sequences
     }
 
-    fn init_piles(cards: &mut InitialCards) -> [CardPile; PILES_AMOUNT] {
-        let mut pile_cards: [CardPile; PILES_AMOUNT] = std::array::from_fn(|_| CardPile::new());
+    fn init_piles(cards: &mut InitialCards) -> [CardPileV2; PILES_AMOUNT] {
+        let mut pile_cards = CardPileV2::init_piles();
         let mut pile_index = 0;
 
         cards.face_down_cards.drain(..).for_each(|card| {
@@ -72,72 +72,44 @@ impl GameTableau {
         pile_cards
     }
 
-    // TODO: Move available_moves calculation logic into Pile static methods?
-    pub fn calculate_available_moves(&self) -> Vec<AvailableMove> {
-        let mut moves = self.calculate_card_on_card_moves();
-        moves.extend(self.calculate_empty_pile_moves());
-
-        moves
-    }
-
-    fn calculate_card_on_card_moves(&self) -> Vec<AvailableMove> {
-        let playable_cards_by_pile: Vec<Vec<Card>> =
-            self.piles.iter().map(|pile| pile.playable_cards()).collect();
+    pub fn calculate_available_moves(&self) -> Vec<CardMove> {
         let mut available_moves = vec![];
 
-        for (src_pile_idx, src_cards) in playable_cards_by_pile.iter().enumerate() {
-            for dest_pile_idx in 0..PILES_AMOUNT {
-                if dest_pile_idx == src_pile_idx {
+        for pile in &self.piles {
+            for other_pile in &self.piles {
+                if other_pile == pile {
                     continue;
                 }
 
-                if let Some(dest_tip_card) = &playable_cards_by_pile[dest_pile_idx].last() {
-                    for (src_card_idx, src_card) in src_cards.iter().rev().enumerate() {
-                        if src_card.can_move_on(&dest_tip_card) {
-                            available_moves.push(AvailableMove::new(
-                                (src_pile_idx, src_card_idx),
-                                dest_pile_idx,
-                            ));
-                            break;
-                        }
-                    }
-                };
-            }
-        }
-
-        available_moves
-    }
-    fn calculate_empty_pile_moves(&self) -> Vec<AvailableMove> {
-        let playable_cards_by_pile: Vec<Vec<Card>> =
-            self.piles.iter().map(|pile| pile.playable_cards()).collect();
-        let mut available_moves = vec![];
-
-        for (src_pile_idx, src_cards) in playable_cards_by_pile.iter().enumerate() {
-            for dest_pile_idx in 0..PILES_AMOUNT {
-                let dest_pile = &playable_cards_by_pile[dest_pile_idx];
-
-                if dest_pile_idx == src_pile_idx || !dest_pile.is_empty() {
-                    continue;
-                }
-
-                for (src_card_idx, _) in src_cards.iter().enumerate() {
-                    available_moves.push(AvailableMove::new(
-                        (src_pile_idx, src_card_idx),
-                        dest_pile_idx,
-                    ));
-                }
+                available_moves.extend(pile.calc_moves_to(other_pile));
             }
         }
 
         available_moves
     }
 
-    // TODO: Pile move logic
+    pub fn perform_move(&mut self, card_move: CardMove) -> Result<(), ()> {
+        let src_pile: &mut CardPileV2 =
+            unsafe { &mut *(&mut self.piles[card_move.src_pile()] as *mut _) };
+        let dest_pile: &mut CardPileV2 = unsafe { &mut *(&mut self.piles[card_move.dest_pile()] as *mut _) };
+
+        match card_move.move_type() {
+            CardMoveType::OnEmptyPile(src_card) => {
+                src_pile.perform_empty_pile_move(dest_pile, src_card)
+            }
+            CardMoveType::OnCardPile => {
+                src_pile.perform_card_pile_move(dest_pile)
+            }
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::game::core::{Rank, Suit};
+    use crate::game::{
+        core::{Rank, Suit},
+        v2::CardMoveBuilder,
+    };
 
     use super::*;
 
@@ -153,10 +125,19 @@ mod tests {
         });
 
         let mut expected_moves = vec![
-            AvailableMove::new((0, 0), 1),
-            AvailableMove::new((0, 0), 3),
-            AvailableMove::new((1, 0), 3),
-            AvailableMove::new((2, 0), 3),
+            CardMoveBuilder::from_pile(0).to_card_pile(1).build(),
+            CardMoveBuilder::from_pile(0)
+                .using_card(0)
+                .to_empty_pile(3)
+                .build(),
+            CardMoveBuilder::from_pile(1)
+                .using_card(0)
+                .to_empty_pile(3)
+                .build(),
+            CardMoveBuilder::from_pile(2)
+                .using_card(0)
+                .to_empty_pile(3)
+                .build(),
         ];
         expected_moves.sort();
 
@@ -167,43 +148,62 @@ mod tests {
     }
 
     #[test]
-    fn test_simple_card_move() {
-        let tableau = GameTableau::from_piles([
-            CardPile::from_cards(vec![Card::new_opened(Rank::Two, Suit::Hearts)]),
-            CardPile::from_cards(vec![Card::new_opened(Rank::Three, Suit::Hearts)]),
-            CardPile::from_cards(vec![]),
-            CardPile::from_cards(vec![]),
-        ]);
+    fn test_available_card_moves_simple() {
+        let tableau = GameTableau::new(InitialCards {
+            face_down_cards: vec![],
+            face_up_cards: vec![
+                Card::new_opened(Rank::Two, Suit::Hearts),
+                Card::new_opened(Rank::Three, Suit::Hearts),
+            ],
+        });
 
-        let expected_card_moves = vec![AvailableMove::new((0, 0), 1)];
+        let expected_card_moves = vec![CardMoveBuilder::from_pile(0).to_card_pile(1).build()];
 
-        let result = tableau.calculate_card_on_card_moves();
+        let result_card_moves: Vec<CardMove> = tableau
+            .calculate_available_moves()
+            .iter()
+            .filter(|m| m.is_on_card_pile_move())
+            .cloned()
+            .collect();
 
-        assert_eq!(expected_card_moves, result);
+        assert_eq!(expected_card_moves, result_card_moves);
     }
 
     #[test]
-    fn test_harder_card_move() {
+    fn test_available_card_moves_harder() {
         let tableau = GameTableau::from_piles([
-            CardPile::from_cards(vec![
-                Card::new_opened(Rank::Two, Suit::Hearts),
-                Card::new_opened(Rank::Three, Suit::Hearts),
-                Card::new_opened(Rank::Four, Suit::Hearts),
-                Card::new_opened(Rank::Five, Suit::Hearts),
-            ]),
-            CardPile::from_cards(vec![
-                Card::new_opened(Rank::Four, Suit::Hearts),
-                Card::new_opened(Rank::Five, Suit::Hearts),
-                Card::new_opened(Rank::Six, Suit::Hearts),
-            ]),
-            CardPile::from_cards(vec![]),
-            CardPile::from_cards(vec![]),
+            CardPileV2::from_cards(
+                vec![
+                    Card::new_opened(Rank::Five, Suit::Hearts),
+                    Card::new_opened(Rank::Four, Suit::Hearts),
+                    Card::new_opened(Rank::Three, Suit::Hearts),
+                    Card::new_opened(Rank::Two, Suit::Hearts),
+                ],
+                0,
+            ),
+            CardPileV2::from_cards(
+                vec![
+                    Card::new_opened(Rank::Six, Suit::Hearts),
+                    Card::new_opened(Rank::Five, Suit::Hearts),
+                    Card::new_opened(Rank::Four, Suit::Hearts),
+                ],
+                1,
+            ),
+            CardPileV2::from_cards(vec![], 2),
+            CardPileV2::from_cards(vec![], 3),
         ]);
 
-        let expected_card_moves = vec![AvailableMove::new((0, 1), 1)];
+        let expected_card_moves = vec![
+            CardMoveBuilder::from_pile(0).to_card_pile(1).build(),
+            CardMoveBuilder::from_pile(1).to_card_pile(0).build(),
+        ];
+        let result_card_moves: Vec<CardMove> = tableau
+            .calculate_available_moves()
+            .iter()
+            .filter(|m| m.is_on_card_pile_move())
+            .cloned()
+            .collect();
 
-        let result = tableau.calculate_card_on_card_moves();
-
-        assert_eq!(expected_card_moves, result);
+        assert_eq!(expected_card_moves, result_card_moves);
     }
 }

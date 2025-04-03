@@ -4,11 +4,11 @@ use crate::game::card_stock::InitialCards;
 use crate::game::core::{Card, PILES_AMOUNT, Suit};
 use crate::game::{card_stock_trait::ICardStock, core::Rank};
 
-pub struct SameCardIncDealStock {
+pub struct SameCardDecDealStock {
     rank: Rank,
 }
 
-impl SameCardIncDealStock {
+impl SameCardDecDealStock {
     pub fn new(starting_rank: Rank) -> Self {
         Self {
             rank: starting_rank,
@@ -16,7 +16,7 @@ impl SameCardIncDealStock {
     }
 }
 
-impl fmt::Display for SameCardIncDealStock {
+impl fmt::Display for SameCardDecDealStock {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -26,7 +26,7 @@ impl fmt::Display for SameCardIncDealStock {
     }
 }
 
-impl ICardStock for SameCardIncDealStock {
+impl ICardStock for SameCardDecDealStock {
     fn deals_left(&self) -> usize {
         999
     }
@@ -35,7 +35,7 @@ impl ICardStock for SameCardIncDealStock {
         let same_cards = (0..PILES_AMOUNT)
             .map(|_| Card::new_opened(self.rank, Suit::Spades))
             .collect();
-        self.rank = self.rank.next().unwrap_or(Rank::Ace);
+        self.rank = self.rank.prev().unwrap_or(Rank::King);
 
         Some(same_cards)
     }

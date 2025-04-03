@@ -81,7 +81,7 @@ fn make_deck_of(suits: Vec<Suit>, full_sequences_per_suit: usize) -> Vec<Card> {
     suits
         .iter()
         .map(|suit| {
-            let full_sequence = Card::make_full_sequence_of(*suit);
+            let full_sequence = Card::make_complete_sequence_of(*suit);
 
             std::iter::repeat(full_sequence)
                 .take(full_sequences_per_suit)

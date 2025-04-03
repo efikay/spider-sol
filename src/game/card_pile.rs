@@ -21,6 +21,8 @@ impl fmt::Display for CardPile {
     }
 }
 
+const NO_CARDS: [Card; 0] = [];
+
 impl CardPile {
     pub fn new() -> Self {
         Self {
@@ -73,20 +75,12 @@ impl CardPile {
         }
     }
 
-    pub fn playable_cards(&self) -> Vec<Card> {
-        if let Some(last_seq) = self.sequences.peek() {
-            last_seq.cards.clone()
-        } else {
-            vec![]
+    pub fn playable_cards(&self) -> &[Card] {
+        match self.sequences.peek() {
+            Some(seq) => &seq.cards,
+            None => &NO_CARDS,
         }
     }
 
-    fn cards(&self) -> Vec<Card> {
-        self.sequences
-            .iter()
-            .flat_map(|seq| seq.cards.clone())
-            .collect()
-    }
-
-    // TODO: Pile logic + move-out/move-in logic and full_sequence detection
+    // TODO: Pile logic + move-out/move-in logic
 }
