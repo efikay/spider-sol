@@ -9,6 +9,8 @@ use super::{
 };
 use crate::game::game_tableau::GameTableau;
 
+const COMPLETE_SEQUENCES_TO_WIN: usize = 8;
+
 pub struct GameEngine<CardStockT: ICardStock> {
     tableau: GameTableau,
     stock: CardStockT,
@@ -59,7 +61,7 @@ impl<CardStockT: ICardStock> GameEngine<CardStockT> {
     }
 
     pub fn is_won(&self) -> bool {
-        self.complete_sequences.len() >= 8
+        self.complete_sequences.len() >= COMPLETE_SEQUENCES_TO_WIN
     }
 
     // TODO: More game logic

@@ -9,6 +9,8 @@ use crate::{
     game::core::{Card, GameMode, Suit},
 };
 
+const FRESH_DECK_CARDS_AMOUNT: usize = 104;
+
 pub struct CardDeck {
     remaining_cards: Stack<Card>,
 }
@@ -39,11 +41,11 @@ impl CardDeck {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.len() == 0
+        self.remaining_cards.is_empty()
     }
 
     pub fn is_fresh(&self) -> bool {
-        self.len() == 104 // Exact amount of cards for the traditional spooder game
+        self.len() == FRESH_DECK_CARDS_AMOUNT
     }
 
     pub fn take_card(&mut self) -> Option<Card> {
