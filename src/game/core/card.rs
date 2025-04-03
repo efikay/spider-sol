@@ -13,24 +13,6 @@ pub struct Card {
     pub is_opened: bool, // false means "card back is shown, card cannot be played"
 }
 
-impl fmt::Display for Card {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let (opened_bracket, closed_bracket) = match self.is_opened {
-            true => ('<', '>'),
-            false => ('{', '}'),
-        };
-
-        write!(
-            f,
-            "{}{}{}{}",
-            opened_bracket,
-            self.rank.to_human(),
-            self.suit.symbol(),
-            closed_bracket
-        )
-    }
-}
-
 impl Card {
     pub fn new(rank: Rank, suit: Suit) -> Self {
         Self {
@@ -77,5 +59,24 @@ impl Card {
     }
     pub fn make_complete_sequence_of_opened(suit: Suit) -> Vec<Card> {
         Rank::iter().map(|r| Card::new_opened(r, suit)).collect()
+    }
+}
+
+// ------ Formatting ------ ///
+impl fmt::Display for Card {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let (opened_bracket, closed_bracket) = match self.is_opened {
+            true => ('<', '>'),
+            false => ('{', '}'),
+        };
+
+        write!(
+            f,
+            "{}{}{}{}",
+            opened_bracket,
+            self.rank.to_human(),
+            self.suit.symbol(),
+            closed_bracket
+        )
     }
 }

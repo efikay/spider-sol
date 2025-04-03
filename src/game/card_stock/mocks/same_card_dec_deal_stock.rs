@@ -16,16 +16,6 @@ impl SameCardDecDealStock {
     }
 }
 
-impl fmt::Display for SameCardDecDealStock {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "SameCardIncDealStock {{ rank: {} }}",
-            self.rank.to_human()
-        )
-    }
-}
-
 impl ICardStock for SameCardDecDealStock {
     fn deals_left(&self) -> usize {
         999
@@ -44,5 +34,16 @@ impl ICardStock for SameCardDecDealStock {
         (0..PILES_AMOUNT)
             .map(|_| Card::new_opened(self.rank, Suit::Spades))
             .collect()
+    }
+}
+
+// ------ Formatting ------ ///
+impl fmt::Display for SameCardDecDealStock {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "SameCardIncDealStock {{ rank: {} }}",
+            self.rank.to_human()
+        )
     }
 }
