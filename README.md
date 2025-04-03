@@ -12,7 +12,7 @@ Info:
   - [x] Full sequences
   - [x] Deals
   - [x] Win condition
-  - [ ] Move cards between piles
+  - [x] Move cards between piles
   - [ ] ...etc?
   - [ ] (Advanced) Undo
 2. [ ] ChooseTUI library (one of):
