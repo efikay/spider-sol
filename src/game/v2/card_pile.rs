@@ -2,9 +2,8 @@
 
 use std::fmt;
 
-use crate::game::core::{COMPLETE_SEQUENCE_LENGTH, Card, PILES_AMOUNT};
-
 use super::card_move::{CardMove, CardMoveBuilder};
+use crate::game::core::{COMPLETE_SEQUENCE_LENGTH, Card, PILES_AMOUNT};
 
 const NO_CARDS: [Card; 0] = [];
 
@@ -13,12 +12,6 @@ pub struct CardPileV2 {
     cards: Vec<Card>,
     // Not rly good but super handy
     index: usize,
-}
-
-impl PartialEq for CardPileV2 {
-    fn eq(&self, other: &Self) -> bool {
-        self.index == other.index
-    }
 }
 
 impl CardPileV2 {
@@ -79,7 +72,7 @@ impl CardPileV2 {
         assert!(target_pile.is_empty());
 
         for card in &self.extract_playable_cards_from(card_from) {
-            // TODO: Add specific method for this
+            // TODO: Add specific method for better semantic
             target_pile.add_start_card(*card);
         }
 
@@ -97,7 +90,7 @@ impl CardPileV2 {
                 .find(|(_, card)| card.can_move_on(other_tail_card))
             {
                 for card in &self.extract_playable_cards_from(card_from) {
-                    // TODO: Add specific method for this
+                    // TODO: Add specific method for better semantic
                     target_pile.add_start_card(*card);
                 }
 
@@ -201,6 +194,14 @@ impl CardPileV2 {
     }
 }
 
+// -------- Eq -------- ///
+impl PartialEq for CardPileV2 {
+    fn eq(&self, other: &Self) -> bool {
+        self.index == other.index
+    }
+}
+
+// -------- Formatting -------- ///
 impl fmt::Display for CardPileV2 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         for seq in &self.seqs() {

@@ -2,30 +2,16 @@
 
 use core::fmt;
 
-use crate::game::{card_stock_trait::ICardStock, game_tableau::GameTableau};
-
 use super::{
     core::{COMPLETE_SEQUENCE_LENGTH, Card},
     v2::CardMove,
 };
+use crate::game::{card_stock_trait::ICardStock, game_tableau::GameTableau};
 
 pub struct GameEngine<CardStockT: ICardStock> {
     tableau: GameTableau,
     stock: CardStockT,
     complete_sequences: Vec<[Card; COMPLETE_SEQUENCE_LENGTH]>,
-}
-
-impl<CardStockT: ICardStock + std::fmt::Display> fmt::Display for GameEngine<CardStockT> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        writeln!(f, "<GameEngine>")?;
-        writeln!(f, "{}", self.stock)?;
-        writeln!(f, "{}", self.tableau)?;
-        writeln!(f, "Complete sequences: {}", self.complete_sequences.len())?;
-        writeln!(f, "Deals left: {}", self.stock.deals_left())?;
-        writeln!(f, "Won?: {}", self.is_won())?;
-        writeln!(f, "Available moves: (TODO fmt)")?;
-        writeln!(f, "</GameEngine>")
-    }
 }
 
 impl<CardStockT: ICardStock> GameEngine<CardStockT> {
@@ -76,4 +62,18 @@ impl<CardStockT: ICardStock> GameEngine<CardStockT> {
     }
 
     // TODO: More game logic
+}
+
+/// ------ Formatting ------ ///
+impl<CardStockT: ICardStock + std::fmt::Display> fmt::Display for GameEngine<CardStockT> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        writeln!(f, "<GameEngine>")?;
+        writeln!(f, "{}", self.stock)?;
+        writeln!(f, "{}", self.tableau)?;
+        writeln!(f, "Complete sequences: {}", self.complete_sequences.len())?;
+        writeln!(f, "Deals left: {}", self.stock.deals_left())?;
+        writeln!(f, "Won?: {}", self.is_won())?;
+        writeln!(f, "Available moves: (TODO fmt)")?;
+        writeln!(f, "</GameEngine>")
+    }
 }

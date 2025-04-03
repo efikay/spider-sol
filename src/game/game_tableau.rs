@@ -2,27 +2,14 @@
 
 use core::fmt;
 
-use crate::game::{card_stock::InitialCards, core::Card};
-
 use super::{
     core::{COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT},
     v2::{CardMove, CardMoveType, CardPileV2},
 };
+use crate::game::{card_stock::InitialCards, core::Card};
 
 pub struct GameTableau {
     piles: [CardPileV2; PILES_AMOUNT],
-}
-
-impl fmt::Display for GameTableau {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        writeln!(f, "<GameTableau>")?;
-        writeln!(f, "Piles:")?;
-        for (i, pile) in self.piles.iter().enumerate() {
-            write!(f, "\t Pile {}:", i)?;
-            writeln!(f, "{}", pile)?;
-        }
-        writeln!(f, "</GameTableau>")
-    }
 }
 
 impl GameTableau {
@@ -91,16 +78,28 @@ impl GameTableau {
     pub fn perform_move(&mut self, card_move: CardMove) -> Result<(), ()> {
         let src_pile: &mut CardPileV2 =
             unsafe { &mut *(&mut self.piles[card_move.src_pile()] as *mut _) };
-        let dest_pile: &mut CardPileV2 = unsafe { &mut *(&mut self.piles[card_move.dest_pile()] as *mut _) };
+        let dest_pile: &mut CardPileV2 =
+            unsafe { &mut *(&mut self.piles[card_move.dest_pile()] as *mut _) };
 
         match card_move.move_type() {
             CardMoveType::OnEmptyPile(src_card) => {
                 src_pile.perform_empty_pile_move(dest_pile, src_card)
             }
-            CardMoveType::OnCardPile => {
-                src_pile.perform_card_pile_move(dest_pile)
-            }
+            CardMoveType::OnCardPile => src_pile.perform_card_pile_move(dest_pile),
         }
+    }
+}
+
+/// ------ Formatting ------ ///
+impl fmt::Display for GameTableau {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        writeln!(f, "<GameTableau>")?;
+        writeln!(f, "Piles:")?;
+        for (i, pile) in self.piles.iter().enumerate() {
+            write!(f, "\t Pile {}:", i)?;
+            writeln!(f, "{}", pile)?;
+        }
+        writeln!(f, "</GameTableau>")
     }
 }
 

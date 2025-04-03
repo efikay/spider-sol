@@ -1,4 +1,4 @@
-use crossterm::event::{read, Event, KeyCode};
+use crossterm::event::{Event, KeyCode, read};
 
 pub fn wait_for_enter_press(message: &String) {
     println!("{}", message);

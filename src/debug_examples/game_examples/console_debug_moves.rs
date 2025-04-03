@@ -4,12 +4,15 @@ use std::collections::HashMap;
 
 use crossterm::event::{Event, KeyCode, read};
 
-use crate::{debug_examples::{helpers::read_stdin_as_i32, mock_parts::CardIncCycleInfiniteStock}, game::{
-    card_stock::InitialCards,
-    core::{Card, Rank, Suit},
-    game_engine::GameEngine,
-    game_tableau::GameTableau,
-}};
+use crate::{
+    debug_examples::{helpers::read_stdin_as_i32, mock_parts::CardIncCycleInfiniteStock},
+    game::{
+        card_stock::InitialCards,
+        core::{Card, Rank, Suit},
+        game_engine::GameEngine,
+        game_tableau::GameTableau,
+    },
+};
 
 pub fn console_debug_moves() {
     let mut game = GameEngine::from_tableau_and_stock(

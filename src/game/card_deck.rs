@@ -1,8 +1,7 @@
 #![allow(dead_code)]
+
 use core::fmt;
-
 use rand::prelude::*;
-
 use strum::IntoEnumIterator;
 
 use crate::{
@@ -12,12 +11,6 @@ use crate::{
 
 pub struct CardDeck {
     remaining_cards: Stack<Card>,
-}
-
-impl fmt::Display for CardDeck {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", self.remaining_cards)
-    }
 }
 
 impl CardDeck {
@@ -71,20 +64,28 @@ impl CardDeck {
     }
 }
 
+/// ------- Formatting ------- ///
+impl fmt::Display for CardDeck {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.remaining_cards)
+    }
+}
+
+/// ------- Helpers ------- ///
 fn shuffle_cards(cards: &mut Vec<Card>) {
     let mut rng = rand::rng();
 
     cards.shuffle(&mut rng);
 }
 
-fn make_deck_of(suits: Vec<Suit>, full_sequences_per_suit: usize) -> Vec<Card> {
+fn make_deck_of(suits: Vec<Suit>, complete_sequences_per_suit: usize) -> Vec<Card> {
     suits
         .iter()
         .map(|suit| {
             let full_sequence = Card::make_complete_sequence_of(*suit);
 
             std::iter::repeat(full_sequence)
-                .take(full_sequences_per_suit)
+                .take(complete_sequences_per_suit)
                 .flatten()
         })
         .flatten()
