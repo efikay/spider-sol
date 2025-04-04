@@ -113,6 +113,10 @@ impl CardPileV2 {
         }
     }
 
+    pub fn playable_cards_len(&self) -> usize {
+        self.playable_cards().len()
+    }
+
     pub fn calc_moves_to(&self, other: &CardPileV2) -> Vec<CardMove> {
         let cards = self.playable_cards();
         let other_cards = other.playable_cards();

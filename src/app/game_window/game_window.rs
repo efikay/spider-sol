@@ -11,21 +11,40 @@ use ratatui::{
 
 use crate::game::{card_stock::ICardStock, game_engine::GameEngine};
 
-use super::widgets::TableauWidget;
+use super::{
+    game_cursor::{GameCursor, GameCursorMode},
+    widgets::TableauWidget,
+};
 
 pub struct GameWindow<CardStockT: ICardStock> {
     game_engine: GameEngine<CardStockT>,
+
+    cursor: GameCursor,
 }
 
 impl<CardStockT: ICardStock> GameWindow<CardStockT> {
     pub fn new(stock: CardStockT) -> GameWindow<CardStockT> {
-        let game_engine = GameEngine::new(stock);
-
-        Self { game_engine }
+        Self {
+            game_engine: GameEngine::new(stock),
+            cursor: GameCursor::new(),
+        }
     }
 
     fn deal_cards(&mut self) {
         self.game_engine.deal_cards();
+    }
+
+    fn is_selecting_a_card(&self) -> bool {
+        match self.cursor.mode() {
+            Some(GameCursorMode::CardSelect(_)) => true,
+            _ => false,
+        }
+    }
+    fn is_selecting_a_pile(&self) -> bool {
+        match self.cursor.mode() {
+            Some(GameCursorMode::PileSelect(_)) => true,
+            _ => false,
+        }
     }
 
     // -- Keys -- //
@@ -38,11 +57,57 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             (_, KeyCode::Right | KeyCode::Char('l')) => self.on_right_pressed(),
             // [Deal cards]
             (_, KeyCode::Char('d')) => self.on_d_pressed(),
+            // [Select a card / Select a pile]
+            (_, KeyCode::Enter) => self.on_enter_pressed(),
             _ => {}
         }
     }
+    fn on_enter_pressed(&mut self) {
+        if self.is_selecting_a_card() {
+            // TODO: Select a card by:
+            // - Taking `cursor` position, then
+            // - Finding a card in `game_engine`
+            // - Save the card
+
+            let pile_filters = self
+                .game_engine
+                .tableau()
+                .borrow()
+                .piles()
+                .borrow()
+                .iter()
+                .map(|pile| !pile.is_empty())
+                .collect::<Vec<_>>()
+                .try_into()
+                .unwrap();
+
+            self.cursor.set_for_pile_selection(pile_filters);
+        } else if self.is_selecting_a_pile() {
+            // TODO: Perform a move by:
+            // - Taking `cursor` position, then (one of):
+            //   - (OR) Create a `CardMove` based on saved Card, cursor position and pile.is_empty() state
+            //   - (OR) Find previously(todo?) saved available move based on such data
+            // - Then, perform a move through game_engine
+
+            let playable_card_lengths = self
+                .game_engine
+                .tableau()
+                .borrow()
+                .piles()
+                .borrow()
+                .iter()
+                .map(|pile| !pile.playable_cards_len())
+                .collect::<Vec<_>>()
+                .try_into()
+                .unwrap();
+
+            self.cursor.set_for_card_selection(playable_card_lengths);
+        }
+    }
     fn on_d_pressed(&mut self) {
-        self.deal_cards();
+        if self.is_selecting_a_card() {
+            self.deal_cards();
+        }
     }
     fn on_up_pressed(&self) {
         todo!("TODO: [⤴]")
@@ -73,6 +138,8 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         }
         {
             let tableau_area = areas[1];
+
+            // TODO: Edit Tableau+CardPile widgets states to take required cursor data to highlight what's needed
 
             // Surround the area with a border
             frame.render_widget(Block::bordered(), tableau_area);
