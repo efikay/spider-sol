@@ -57,9 +57,15 @@ impl App {
             (_, KeyCode::Down | KeyCode::Char('j')) => self.on_down_pressed(),
             (_, KeyCode::Up | KeyCode::Char('k')) => self.on_up_pressed(),
             (_, KeyCode::Right | KeyCode::Char('l')) => self.on_right_pressed(),
+            // [Enter]
+            (_, KeyCode::Enter) => self.on_enter_pressed(),
             // Add other key handlers here
             _ => {}
         }
+    }
+
+    fn on_enter_pressed(&mut self) {
+        self.game_window.deal_cards();
     }
 
     fn on_up_pressed(&self) {

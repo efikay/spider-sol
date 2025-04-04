@@ -96,7 +96,7 @@ impl Card {
             } else {
                 format!(
                     "┌─────┐\n\
-                     │{:<3}{}│",
+                     │{:<3}{} │",
                     card.rank.to_human(),
                     card.suit.symbol(),
                 )
