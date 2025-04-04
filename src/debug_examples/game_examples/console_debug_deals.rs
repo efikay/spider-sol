@@ -11,21 +11,7 @@ use crate::game::{
 };
 
 pub fn console_debug_deals() {
-    let mut game = GameEngine::from_tableau_and_stock(
-        GameTableau::new(vec![
-            Card::new_opened(Rank::King, Suit::Spades),
-            Card::new_opened(Rank::King, Suit::Spades),
-            Card::new_opened(Rank::King, Suit::Spades),
-            Card::new_opened(Rank::King, Suit::Spades),
-            Card::new_opened(Rank::King, Suit::Spades),
-            Card::new_opened(Rank::King, Suit::Spades),
-            Card::new_opened(Rank::King, Suit::Spades),
-            Card::new_opened(Rank::King, Suit::Spades),
-            Card::new_opened(Rank::King, Suit::Spades),
-            Card::new_opened(Rank::King, Suit::Spades),
-        ]),
-        SameCardDecDealStock::new(Rank::Queen),
-    );
+    let mut game = GameEngine::new(SameCardDecDealStock::new(Rank::Queen));
 
     println!("Game started (aces start, same card++ deals)");
     while game.deals_left() > 0 {

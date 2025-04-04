@@ -27,13 +27,6 @@ impl<CardStockT: ICardStock> GameEngine<CardStockT> {
             complete_sequences: vec![],
         }
     }
-    pub fn from_tableau_and_stock(tableau: GameTableau, stock: CardStockT) -> Self {
-        Self {
-            stock,
-            tableau,
-            complete_sequences: vec![],
-        }
-    }
 
     pub fn deals_left(&self) -> usize {
         self.stock.deals_left()
