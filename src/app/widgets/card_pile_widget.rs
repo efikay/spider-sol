@@ -1,6 +1,6 @@
-
 use ratatui::{
-    layout::Alignment,
+    buffer::Buffer,
+    layout::{Alignment, Rect},
     style::{Modifier, Style},
     widgets::{Block, List, StatefulWidget, Widget, block::Title},
 };
@@ -13,12 +13,8 @@ pub struct CardPileWidget;
 impl StatefulWidget for CardPileWidget {
     type State = CardPileV2;
 
-    fn render(
-        self,
-        area: ratatui::prelude::Rect,
-        buf: &mut ratatui::prelude::Buffer,
-        state: &mut Self::State,
-    ) where
+    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State)
+    where
         Self: Sized,
     {
         // TODO: List widget is not enough. We need more flexible highlighting

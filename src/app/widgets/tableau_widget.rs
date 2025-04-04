@@ -2,7 +2,8 @@
 use std::{cell::RefCell, rc::Rc};
 
 use ratatui::{
-    layout::{Constraint, Layout},
+    buffer::Buffer,
+    layout::{Constraint, Layout, Rect},
     widgets::StatefulWidget,
 };
 
@@ -16,12 +17,8 @@ pub struct TableauWidget;
 impl StatefulWidget for TableauWidget {
     type State = Rc<RefCell<GameTableau>>;
 
-    fn render(
-        self,
-        area: ratatui::prelude::Rect,
-        buf: &mut ratatui::prelude::Buffer,
-        state: &mut Self::State,
-    ) where
+    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State)
+    where
         Self: Sized,
     {
         let piles = &state.borrow().piles();
