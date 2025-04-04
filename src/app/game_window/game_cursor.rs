@@ -9,7 +9,7 @@ pub enum GameCursorMode {
     ///
     /// Example: (let's assume that PILES_AMOUNT=4)
     ///
-    /// GameCursorMode::CardSelect([2,0,1,3]) means that:
+    /// GameCursorMode::CardSelect([3,0,1,4]) means that:
     /// - [0] you can iterate over 3 last cards of first pile
     /// - [1] you cannot iterate over second pile
     /// - [2] you can select just the tip of third pile
@@ -136,7 +136,7 @@ impl GameCursor {
                         // Assuming that there were no valid piles to place cursor on. So nowhere to move_right in that case
                         assert!(pile_lengths.iter().all(|len| *len == 0))
                     }
-                    Some(max_index) if max_index == PILES_AMOUNT - 1 => {
+                    Some(max_index) if max_index == PILES_AMOUNT => {
                         // TODO: try moving to most-left?
                     }
                     Some(pile_index) => {
@@ -166,7 +166,7 @@ impl GameCursor {
                     None => {
                         assert!(pile_filters.iter().all(|filter| !filter))
                     }
-                    Some(max_index) if max_index == PILES_AMOUNT - 1 => {
+                    Some(max_index) if max_index == PILES_AMOUNT => {
                         // TODO: try moving to most-left?
                     }
                     Some(pile_index) => {
@@ -219,7 +219,7 @@ impl GameCursor {
                     Some(pile_index) => {
                         match self.card_index {
                             Some(max_card_index)
-                                if max_card_index == (pile_lengths[pile_index] - 1) =>
+                                if max_card_index == pile_lengths[pile_index] =>
                             {
                                 // No-no-no...
                                 // TODO: Try to "teleport" to up-most card?

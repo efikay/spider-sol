@@ -96,7 +96,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
                 .piles()
                 .borrow()
                 .iter()
-                .map(|pile| !pile.playable_cards_len())
+                .map(|pile| pile.playable_cards_len())
                 .collect::<Vec<_>>()
                 .try_into()
                 .unwrap();
