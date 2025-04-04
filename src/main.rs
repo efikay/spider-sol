@@ -1,7 +1,7 @@
+mod app;
 mod data_structures;
 mod debug_examples;
 mod game;
-mod app;
 mod utils;
 
 use app::App;
