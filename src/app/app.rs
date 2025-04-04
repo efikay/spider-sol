@@ -33,8 +33,8 @@ impl App {
     fn render(&mut self, frame: &mut Frame) {
         let title = Line::from("Spider solitaire").bold().blue().centered();
         let text = "Hello, dear one!\n\n\
-            About the game: https://en.wikipedia.org/wiki/Spider_(solitaire)\n\
-            Code located here: https://github.com/efikay/spider-sol\n\
+            About the game: https://en.wikipedia.org/wiki/Spider_(solitaire) \n\
+            Code located here: https://github.com/efikay/spider-sol \n\
             Press `Esc`, `Ctrl-C` or `q` to stop running.";
         frame.render_widget(
             Paragraph::new(text)
