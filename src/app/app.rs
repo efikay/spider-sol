@@ -2,27 +2,29 @@
 
 use color_eyre::Result;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
-use ratatui::{
-    DefaultTerminal, Frame,
-    style::Stylize,
-    text::Line,
-    widgets::{Block, Paragraph},
-};
+use ratatui::{DefaultTerminal, Frame};
 
-#[derive(Debug, Default)]
+use crate::game::{card_stock::CardDeckStock, core::GameMode};
+
+use super::game_window::GameWindow;
+
 pub struct App {
-    running: bool,
+    is_running: bool,
+    game_window: GameWindow<CardDeckStock>,
 }
 
 impl App {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new() -> App {
+        Self {
+            is_running: false,
+            game_window: GameWindow::new(CardDeckStock::new(GameMode::TwoSuits)),
+        }
     }
 
     pub fn run(mut self, mut terminal: DefaultTerminal) -> Result<()> {
-        self.running = true;
+        self.is_running = true;
 
-        while self.running {
+        while self.is_running {
             terminal.draw(|frame| self.render(frame))?;
             self.handle_crossterm_events()?;
         }
@@ -31,17 +33,7 @@ impl App {
     }
 
     fn render(&mut self, frame: &mut Frame) {
-        let title = Line::from("Spider solitaire").bold().blue().centered();
-        let text = "Hello, dear one!\n\n\
-            About the game: https://en.wikipedia.org/wiki/Spider_(solitaire) \n\
-            Code located here: https://github.com/efikay/spider-sol \n\
-            Press `Esc`, `Ctrl-C` or `q` to stop running.";
-        frame.render_widget(
-            Paragraph::new(text)
-                .block(Block::bordered().title(title))
-                .centered(),
-            frame.area(),
-        )
+        self.game_window.render_window(frame)
     }
 
     fn handle_crossterm_events(&mut self) -> Result<()> {
@@ -84,6 +76,6 @@ impl App {
     }
 
     fn quit(&mut self) {
-        self.running = false;
+        self.is_running = false;
     }
 }
