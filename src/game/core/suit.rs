@@ -10,10 +10,10 @@ pub enum Suit {
 impl Suit {
     pub fn symbol(&self) -> char {
         match self {
-            Suit::Hearts => '♥',
-            Suit::Spades => '♠',
-            Suit::Clubs => '♣',
-            Suit::Diamonds => '♦',
+            Suit::Hearts => '♡',
+            Suit::Spades => '♤',
+            Suit::Clubs => '♧',
+            Suit::Diamonds => '♢',
         }
     }
 }

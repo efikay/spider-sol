@@ -19,7 +19,7 @@ impl StatefulWidget for CardPileWidget {
     {
         // TODO: List widget is not enough. We need more flexible highlighting
         Widget::render(
-            List::new(state.card_strings())
+            List::new(state.ascii_card_strings())
                 .block(Block::bordered().title(
                     Title::from(format!("Pile {}", state.index() + 1)).alignment(Alignment::Center),
                 ))
