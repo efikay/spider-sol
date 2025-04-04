@@ -35,6 +35,13 @@ impl CardPileV2 {
         self.cards.len()
     }
 
+    pub fn index(&self) -> usize {
+        self.index
+    }
+    pub fn card_strings(&self) -> Vec<String> {
+        self.cards.iter().map(|c| c.to_string()).collect()
+    }
+
     pub fn add_start_card(&mut self, card: Card) {
         self.cards.push(card);
     }
