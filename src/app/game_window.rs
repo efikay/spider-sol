@@ -36,12 +36,12 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             (_, KeyCode::Down | KeyCode::Char('j')) => self.on_down_pressed(),
             (_, KeyCode::Up | KeyCode::Char('k')) => self.on_up_pressed(),
             (_, KeyCode::Right | KeyCode::Char('l')) => self.on_right_pressed(),
-            // [Enter]
-            (_, KeyCode::Enter) => self.on_enter_pressed(),
+            // [Deal cards]
+            (_, KeyCode::Char('d')) => self.on_d_pressed(),
             _ => {}
         }
     }
-    fn on_enter_pressed(&mut self) {
+    fn on_d_pressed(&mut self) {
         self.deal_cards();
     }
     fn on_up_pressed(&self) {
@@ -63,7 +63,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             .split(frame.area());
         {
             let text_area = areas[0];
-            let text = Text::from("Press <Enter> to deal some cards. Press <q> to exit");
+            let text = Text::from("Press <d> to deal some cards. Press <q> to exit");
 
             let paragraph = Paragraph::new(text)
                 .block(Block::bordered())
