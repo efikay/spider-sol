@@ -25,9 +25,10 @@ impl StatefulWidget for TableauWidget {
         Self: Sized,
     {
         let piles = &state.borrow().piles();
+        let pile_w = (100 / PILES_AMOUNT) as u16;
 
         for (pile_index, pile_area) in
-            Layout::horizontal([Constraint::Percentage(10)].repeat(PILES_AMOUNT))
+            Layout::horizontal([Constraint::Percentage(pile_w)].repeat(PILES_AMOUNT))
                 .split(area)
                 .iter()
                 .enumerate()
