@@ -512,6 +512,12 @@ mod tests {
 
     #[test]
     #[ignore]
+    fn should_recalc_correctly_after_updating_constraints() {
+        todo!("Tricky functionality and should be tested");
+    }
+
+    #[test]
+    #[ignore]
     fn should_go_square_correctly() {
         todo!("Tricky functionality and should be tested");
     }
