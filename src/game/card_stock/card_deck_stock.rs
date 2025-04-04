@@ -4,7 +4,7 @@ use core::fmt;
 
 use crate::game::{
     card_deck::CardDeck,
-    core::{Card, PILES_AMOUNT},
+    core::{Card, GameMode, PILES_AMOUNT},
 };
 
 use super::core::ICardStock;
@@ -22,8 +22,10 @@ impl fmt::Display for CardDeckStock {
 }
 
 impl CardDeckStock {
-    pub fn new(deck: CardDeck) -> Self {
-        Self { deck }
+    pub fn new(game_mode: GameMode) -> Self {
+        Self {
+            deck: CardDeck::new(game_mode),
+        }
     }
 }
 
