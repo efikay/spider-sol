@@ -5,10 +5,22 @@ use ratatui::{
     widgets::{List, StatefulWidget, Widget},
 };
 
-use crate::game::v2::CardPileV2;
+use crate::{app::game_window::game_cursor::GameCursor, game::v2::CardPileV2};
 
-#[derive(Clone, Copy, Default)]
-pub struct CardPileWidget;
+#[derive(Clone, Copy)]
+pub struct CardPileWidget {
+    cursor: GameCursor,
+}
+
+impl CardPileWidget {
+    pub fn new(cursor: GameCursor) -> Self {
+        Self { cursor }
+    }
+
+    fn make_ascii_items(&self, pile: &mut CardPileV2) -> Vec<String> {
+        todo!("Make more flexible highlighting with cursor+pile data");
+    }
+}
 
 impl StatefulWidget for CardPileWidget {
     type State = CardPileV2;
@@ -17,9 +29,10 @@ impl StatefulWidget for CardPileWidget {
     where
         Self: Sized,
     {
-        // TODO: List widget is not enough. We need more flexible highlighting
+        let items = self.make_ascii_items(state);
+
         Widget::render(
-            List::new(state.ascii_card_strings())
+            List::new(items)
                 .highlight_style(Style::default().add_modifier(Modifier::BOLD))
                 .highlight_symbol("→"),
             area,

@@ -2,7 +2,7 @@
 
 use crate::game::core::PILES_AMOUNT;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum GameCursorMode {
     /// Cursor used to select a card
     ///
@@ -31,7 +31,7 @@ pub enum GameCursorMode {
     PileSelect([bool; PILES_AMOUNT]),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct GameCursor {
     mode: Option<GameCursorMode>,
 

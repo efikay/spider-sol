@@ -7,12 +7,23 @@ use ratatui::{
     widgets::StatefulWidget,
 };
 
-use crate::game::{core::PILES_AMOUNT, game_tableau::GameTableau};
+use crate::{
+    app::game_window::game_cursor::GameCursor,
+    game::{core::PILES_AMOUNT, game_tableau::GameTableau},
+};
 
 use super::card_pile_widget::CardPileWidget;
 
-#[derive(Clone, Copy, Default)]
-pub struct TableauWidget;
+#[derive(Clone, Copy)]
+pub struct TableauWidget {
+    cursor: GameCursor,
+}
+
+impl TableauWidget {
+    pub fn new(cursor: GameCursor) -> Self {
+        Self { cursor }
+    }
+}
 
 impl StatefulWidget for TableauWidget {
     type State = Rc<RefCell<GameTableau>>;
@@ -32,7 +43,7 @@ impl StatefulWidget for TableauWidget {
         {
             let pile = &mut piles.borrow_mut()[pile_index];
 
-            CardPileWidget::default().render(*pile_area, buf, pile);
+            CardPileWidget::new(self.cursor).render(*pile_area, buf, pile);
         }
     }
 }

@@ -149,7 +149,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             });
 
             frame.render_stateful_widget(
-                TableauWidget::default(),
+                TableauWidget::new(self.cursor),
                 tableau_area,
                 &mut self.game_engine.tableau(),
             )
