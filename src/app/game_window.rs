@@ -28,6 +28,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         self.game_engine.deal_cards();
     }
 
+    // -- Keys -- //
     pub fn on_key_pressed(&mut self, key: KeyEvent) {
         match (key.modifiers, key.code) {
             // [Arrow navigation]
@@ -40,8 +41,6 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             _ => {}
         }
     }
-
-    // -- Keys -- //
     fn on_enter_pressed(&mut self) {
         self.deal_cards();
     }
