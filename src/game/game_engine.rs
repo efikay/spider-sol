@@ -56,8 +56,6 @@ impl<CardStockT: ICardStock> GameEngine<CardStockT> {
     pub fn is_won(&self) -> bool {
         self.complete_sequences.len() >= COMPLETE_SEQUENCES_TO_WIN
     }
-
-    // TODO: More game logic
 }
 
 /// ------ Formatting ------ ///
