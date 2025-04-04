@@ -27,7 +27,7 @@ pub enum GameCursorMode {
     /// - you can drop selected card on first pile
     /// - you also can drop card on second pile
     /// - you cannot drop a card to third pile
-    /// - you're welcome to drop a card on third pile
+    /// - you're welcome to drop a card on last pile
     PileSelect([bool; PILES_AMOUNT]),
 }
 
@@ -35,9 +35,9 @@ pub enum GameCursorMode {
 pub struct GameCursor {
     mode: Option<GameCursorMode>,
 
-    // Cursor position
+    // Cursor (left-right) position
     pile_index: Option<usize>,
-    // Cursor position
+    // Cursor (up-down) position
     card_index: Option<usize>,
 }
 
@@ -505,8 +505,49 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn should_jump_over_empty_piles() {
+        let pile_lengths: [usize; PILES_AMOUNT] = [5, 0, 0, 1];
+        let pile_filters = pile_lengths.map(|p| p > 0);
+
+        let mut cursor = GameCursor::new();
+
+        cursor.set_for_card_selection(pile_lengths);
+
+        cursor.move_right();
+        assert_eq!(cursor.pile_index, Some(3));
+        cursor.move_left();
+        assert_eq!(cursor.pile_index, Some(0));
+
+        cursor.set_for_pile_selection(pile_filters);
+
+        cursor.move_right();
+        assert_eq!(cursor.pile_index, Some(3));
+        cursor.move_left();
+        assert_eq!(cursor.pile_index, Some(0));
+    }
+
+    #[test]
+    fn should_recalc_pile_correctly_tricky() {
+        {
+            let pile_lengths: [usize; PILES_AMOUNT] = [0, 0, 1, 0];
+            let mut cursor = GameCursor::new();
+
+            cursor.set_for_card_selection(pile_lengths);
+            assert_eq!(cursor.mode, Some(GameCursorMode::CardSelect(pile_lengths)));
+            assert_eq!(cursor.pile_index, Some(2));
+        }
+
+        let pile_lengths: [usize; PILES_AMOUNT] = [0, 0, 0, 0];
+        let mut cursor = GameCursor::new();
+
+        cursor.set_for_card_selection(pile_lengths);
+        assert_eq!(cursor.mode, Some(GameCursorMode::CardSelect(pile_lengths)));
+        assert_eq!(cursor.pile_index, None);
+    }
+
+    #[test]
+    #[ignore]
+    fn should_use_prev_card_index_after_jump_when_possible() {
         todo!("Tricky functionality and should be tested");
     }
 
