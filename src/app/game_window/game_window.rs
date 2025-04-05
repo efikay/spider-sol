@@ -24,14 +24,39 @@ pub struct GameWindow<CardStockT: ICardStock> {
 
 impl<CardStockT: ICardStock> GameWindow<CardStockT> {
     pub fn new(stock: CardStockT) -> GameWindow<CardStockT> {
+        let game_engine = GameEngine::new(stock);
+
+        let mut cursor = GameCursor::new();
+
+        let cursor_constraints = game_engine
+            .tableau()
+            .borrow()
+            .piles()
+            .borrow()
+            .iter()
+            .map(|pile| pile.playable_cards_len())
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap();
+        cursor.set_for_card_selection(cursor_constraints);
+
         Self {
-            game_engine: GameEngine::new(stock),
-            cursor: GameCursor::new(),
+            game_engine,
+            cursor,
         }
     }
 
     fn deal_cards(&mut self) {
         self.game_engine.deal_cards();
+    }
+    fn deals_left(&self) -> usize {
+        self.game_engine.deals_left()
+    }
+    fn can_deal_cards(&mut self) -> bool {
+        match self.cursor.mode() {
+            Some(GameCursorMode::CardSelect(_)) => self.game_engine.deals_left() > 0,
+            _ => false,
+        }
     }
 
     fn is_selecting_a_card(&self) -> bool {
@@ -105,30 +130,38 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         }
     }
     fn on_d_pressed(&mut self) {
-        if self.is_selecting_a_card() {
+        if !self.is_selecting_a_pile() && self.game_engine.deals_left() > 0 {
             self.deal_cards();
         }
     }
-    fn on_up_pressed(&self) {
-        todo!("TODO: [⤴]")
+    fn on_up_pressed(&mut self) {
+        self.cursor.move_up();
     }
-    fn on_down_pressed(&self) {
-        todo!("TODO: [↓]")
+    fn on_down_pressed(&mut self) {
+        self.cursor.move_down();
     }
-    fn on_left_pressed(&self) {
-        todo!("TODO: [←]")
+    fn on_left_pressed(&mut self) {
+        self.cursor.move_left();
     }
-    fn on_right_pressed(&self) {
-        todo!("TODO: [→]")
+    fn on_right_pressed(&mut self) {
+        self.cursor.move_right();
     }
 
     // --- Render --- //
-    pub fn render_window(&self, frame: &mut Frame) {
+    pub fn render_window(&mut self, frame: &mut Frame) {
         let areas = Layout::vertical([Constraint::Percentage(10), Constraint::Percentage(90)])
             .split(frame.area());
         {
             let text_area = areas[0];
-            let text = Text::from("Press <d> to deal some cards. Press <q> to exit");
+            let text = Text::from(format!(
+                "Deals left: {} {}| <q> - exit",
+                self.game_engine.deals_left(),
+                if self.can_deal_cards() {
+                    "| <d> - Take deal "
+                } else {
+                    ""
+                }
+            ));
 
             let paragraph = Paragraph::new(text)
                 .block(Block::bordered())
@@ -138,8 +171,6 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         }
         {
             let tableau_area = areas[1];
-
-            // TODO: Edit Tableau+CardPile widgets states to take required cursor data to highlight what's needed
 
             // Surround the area with a border
             frame.render_widget(Block::bordered(), tableau_area);
