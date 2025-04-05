@@ -33,13 +33,7 @@ impl StatefulWidget for CardPileWidget {
     {
         let ascii_cards = make_ascii_cards(&self.cursor, state);
 
-        Widget::render(
-            List::new(ascii_cards)
-                .highlight_style(Style::default().add_modifier(Modifier::BOLD))
-                .highlight_symbol("→"),
-            area,
-            buf,
-        )
+        Widget::render(List::new(ascii_cards), area, buf)
     }
 }
 
@@ -49,28 +43,32 @@ fn make_ascii_cards<'a>(cursor: &'a GameCursor, pile: &'a mut CardPileV2) -> Vec
     let pile_index = pile.index();
     let cards_len = pile.cards().len();
 
-    let (active_card_idx, is_pile_highlighted) = match cursor.mode() {
-        Some(GameCursorMode::CardSelect(active_cards_tail_len)) => {
-            match cursor.card_index() {
-                Some(card_idx) => match cursor.pile_index() {
-                    Some(active_pile_index) if active_pile_index == pile_index => (
-                        Some(cards_len - active_cards_tail_len[pile_index] + card_idx),
-                        false,
-                    ),
-                    _ => (None, false),
-                },
-                None => (None, false),
-            }
-        }
-        Some(GameCursorMode::PileSelect(piles_filter)) => (None, piles_filter[pile_index]),
+    let (active_card_start_idx, is_pile_highlighted) = match cursor.mode() {
+        Some(GameCursorMode::CardSelect(active_cards_tail_len)) => match cursor.card_index() {
+            Some(card_idx) => match cursor.pile_index() {
+                Some(active_pile_index) if active_pile_index == pile_index => (
+                    Some(cards_len - active_cards_tail_len[pile_index] + card_idx),
+                    false,
+                ),
+                _ => (None, false),
+            },
+            None => (None, false),
+        },
+        Some(GameCursorMode::PileSelect(piles_filter)) => match cursor.pile_index() {
+            Some(active_pile_index) => (
+                None,
+                active_pile_index == pile_index && piles_filter[active_pile_index],
+            ),
+            None => (None, false),
+        },
         None => (None, false),
     };
 
     for (card_index, card) in pile.cards().iter().enumerate() {
         let is_last = card_index == cards_len - 1;
-        let is_highlighted = is_pile_highlighted
-            || match active_card_idx {
-                Some(index) => index == card_index,
+        let is_highlighted = (is_pile_highlighted && is_last)
+            || match active_card_start_idx {
+                Some(index) => card_index >= index,
                 None => false,
             };
 
@@ -115,7 +113,7 @@ fn make_ascii_card(card: &Card, is_highlighted: bool, is_last: bool) -> Text {
             Text::from(vec![
                 Line::from("┌─────┐"),
                 Line::from(vec![Span::styled(
-                    format!("|{:<3}{} |", card.rank.to_human(), card.suit.symbol()),
+                    format!("│{:<3}{} │", card.rank.to_human(), card.suit.symbol()),
                     Style::default(),
                 )]),
             ])
