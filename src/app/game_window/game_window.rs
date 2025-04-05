@@ -37,12 +37,22 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         }
     }
 
+    fn has_empty_piles(&self) -> bool {
+        let tableau = self.game_engine.tableau();
+        let tableau = tableau.borrow();
+
+        let piles = tableau.piles();
+        let piles = piles.borrow();
+
+        piles.iter().any(|p| p.is_empty())
+    }
+
     fn deals_left(&self) -> usize {
         self.game_engine.deals_left()
     }
     fn can_deal_cards(&mut self) -> bool {
         match self.cursor.mode() {
-            Some(GameCursorMode::CardSelect(_)) => self.deals_left() > 0,
+            Some(GameCursorMode::CardSelect(_)) => self.deals_left() > 0 && !self.has_empty_piles(),
             _ => false,
         }
     }
