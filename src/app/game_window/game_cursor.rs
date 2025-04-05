@@ -59,6 +59,20 @@ impl GameCursor {
         self.card_index
     }
 
+    pub fn update_constraints(&mut self, constraints: [usize; PILES_AMOUNT]) {
+        match self.mode {
+            Some(GameCursorMode::CardSelect(_)) => {
+                self.set_for_card_selection(constraints);
+            }
+            Some(GameCursorMode::PileSelect(_)) => {
+                self.set_for_pile_selection(constraints);
+            }
+            None => {
+                panic!("Do not update constraints when there is no cursor mode!")
+            }
+        }
+    }
+
     pub fn set_for_card_selection(&mut self, constraints: [usize; PILES_AMOUNT]) {
         self.mode = Some(GameCursorMode::CardSelect(constraints));
 
