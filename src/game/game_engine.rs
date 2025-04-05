@@ -52,6 +52,10 @@ impl<CardStockT: ICardStock> GameEngine<CardStockT> {
         self.tableau.borrow_mut().perform_move(card_move)
     }
 
+    pub fn complete_sequences_count(&self) -> usize {
+        self.complete_sequences.len()
+    }
+
     pub fn search_and_update_complete_sequences(&mut self) {
         self.complete_sequences
             .extend(self.tableau.borrow_mut().extract_complete_sequences());

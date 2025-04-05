@@ -9,7 +9,9 @@ use ratatui::{
     widgets::{Block, Paragraph},
 };
 
-use crate::game::{card_stock::ICardStock, game_engine::GameEngine};
+use crate::game::{
+    card_stock::ICardStock, core::PILES_AMOUNT, game_engine::GameEngine, v2::CardMoveBuilder,
+};
 
 use super::{
     game_cursor::{GameCursor, GameCursorMode},
@@ -20,6 +22,9 @@ pub struct GameWindow<CardStockT: ICardStock> {
     game_engine: GameEngine<CardStockT>,
 
     cursor: GameCursor,
+    // TODO: move those indexes to cursor
+    selected_card_index: Option<usize>,
+    selected_card_pile_index: Option<usize>,
 }
 
 impl<CardStockT: ICardStock> GameWindow<CardStockT> {
@@ -27,22 +32,13 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         let game_engine = GameEngine::new(stock);
 
         let mut cursor = GameCursor::new();
-
-        let cursor_constraints = game_engine
-            .tableau()
-            .borrow()
-            .piles()
-            .borrow()
-            .iter()
-            .map(|pile| pile.playable_cards_len())
-            .collect::<Vec<_>>()
-            .try_into()
-            .unwrap();
-        cursor.set_for_card_selection(cursor_constraints);
+        cursor.set_for_card_selection(std::array::from_fn(|_| 0));
 
         Self {
             game_engine,
             cursor,
+            selected_card_index: None,
+            selected_card_pile_index: None,
         }
     }
 
@@ -65,11 +61,76 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             _ => false,
         }
     }
-    fn is_selecting_a_pile(&self) -> bool {
+    fn is_placing_a_card(&self) -> bool {
         match self.cursor.mode() {
             Some(GameCursorMode::PileSelect(_)) => true,
             _ => false,
         }
+    }
+
+    fn select_current_cursor_position_card(&mut self) -> Result<(), ()> {
+        if let (Some(cursor_card_idx), Some(cursor_pile_idx)) =
+            (self.cursor.card_index(), self.cursor.pile_index())
+        {
+            self.selected_card_pile_index = Some(cursor_pile_idx);
+            self.selected_card_index = Some(cursor_card_idx);
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+
+    fn attempt_to_place_selected_card_to_current_cursor_position(&mut self) -> Result<(), ()> {
+        if let (Some(selected_card_idx), Some(selected_card_pile_idx), Some(target_pile_idx)) = (
+            self.selected_card_index,
+            self.selected_card_pile_index,
+            self.cursor.pile_index(),
+        ) {
+
+            let is_target_pile_empty = {
+                let tableau = &self.game_engine.tableau();
+                let tableau = tableau.borrow();
+    
+                let piles = tableau.piles();
+                let piles = piles.borrow();
+    
+                piles[target_pile_idx].is_empty()
+            };
+
+            if is_target_pile_empty {
+                self.game_engine.perform_move(
+                    CardMoveBuilder::from_pile(selected_card_pile_idx)
+                        .using_card(selected_card_idx)
+                        .to_empty_pile(target_pile_idx)
+                        .build(),
+                )
+            } else {
+                self.game_engine.perform_move(
+                    CardMoveBuilder::from_pile(selected_card_pile_idx)
+                        .to_card_pile(target_pile_idx)
+                        .build(),
+                )
+            }
+        } else {
+            Err(())
+        }
+    }
+
+    fn calc_playable_card_lengths(&self) -> [usize; PILES_AMOUNT] {
+        self.game_engine
+            .tableau()
+            .borrow()
+            .piles()
+            .borrow()
+            .iter()
+            .map(|pile| pile.playable_cards_len())
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap()
+    }
+    fn update_cursor_constraints(&mut self) {
+        self.cursor
+            .update_constraints(self.calc_playable_card_lengths());
     }
 
     // -- Keys -- //
@@ -88,37 +149,22 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         }
     }
     fn on_enter_pressed(&mut self) {
-        let playable_card_lengths = self
-            .game_engine
-            .tableau()
-            .borrow()
-            .piles()
-            .borrow()
-            .iter()
-            .map(|pile| pile.playable_cards_len())
-            .collect::<Vec<_>>()
-            .try_into()
-            .unwrap();
-
         if self.is_selecting_a_card() {
-            // TODO: Select a card by:
-            // - Taking `cursor` position, then
-            // - Finding a card in `game_engine`
-            // - Save the card
+            if let Ok(_) = self.select_current_cursor_position_card() {
+                self.cursor
+                    .set_for_pile_selection(self.calc_playable_card_lengths());
+            }
+        } else if self.is_placing_a_card() {
+            if let Ok(_) = self.attempt_to_place_selected_card_to_current_cursor_position() {
+                //
+            }
 
-            self.cursor.set_for_pile_selection(playable_card_lengths);
-        } else if self.is_selecting_a_pile() {
-            // TODO: Perform a move by:
-            // - Taking `cursor` position, then (one of):
-            //   - (OR) Create a `CardMove` based on saved Card, cursor position and pile.is_empty() state
-            //   - (OR) Find previously(todo?) saved available move based on such data
-            // - Then, perform a move through game_engine
-
-            self.cursor.set_for_card_selection(playable_card_lengths);
+            self.cursor
+                .set_for_card_selection(self.calc_playable_card_lengths());
         }
     }
     fn on_d_pressed(&mut self) {
-        if !self.is_selecting_a_pile() && self.game_engine.deals_left() > 0 {
+        if !self.is_placing_a_card() && self.game_engine.deals_left() > 0 {
             self.deal_cards();
         }
     }
@@ -137,18 +183,22 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
 
     // --- Render --- //
     pub fn render_window(&mut self, frame: &mut Frame) {
+        self.game_engine.search_and_update_complete_sequences();
+        self.update_cursor_constraints();
+
         let areas = Layout::vertical([Constraint::Percentage(10), Constraint::Percentage(90)])
             .split(frame.area());
         {
             let text_area = areas[0];
             let text = Text::from(format!(
-                "Deals left: {} {}| <q> - exit",
+                "Deals left: {} {}| <q> - exit || Complete sequences - {}",
                 self.game_engine.deals_left(),
                 if self.can_deal_cards() {
                     "| <d> - Take deal "
                 } else {
                     ""
-                }
+                },
+                self.game_engine.complete_sequences_count()
             ));
 
             let paragraph = Paragraph::new(text)
