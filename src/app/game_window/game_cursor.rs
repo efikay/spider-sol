@@ -85,11 +85,12 @@ impl GameCursor {
                     }
                     Some(pile_index) => {
                         for pile_index_candidate in (0..pile_index).rev() {
-                            let is_valid = pile_lengths[pile_index_candidate] > 0;
-                            if is_valid {
+                            let candidate_pile_length = pile_lengths[pile_index_candidate];
+
+                            if candidate_pile_length > 0 {
                                 if let Some(prev_card_index) = self.card_index {
-                                    let is_still_valid =
-                                        pile_lengths.get(prev_card_index).is_some();
+                                    let is_still_valid = prev_card_index < candidate_pile_length;
+
                                     if is_still_valid {
                                         // Just update the pile_index. card_index is still good
                                         self.pile_index = Some(pile_index_candidate);
@@ -143,11 +144,12 @@ impl GameCursor {
                     }
                     Some(pile_index) => {
                         for pile_index_candidate in (pile_index + 1)..PILES_AMOUNT {
-                            let is_valid = pile_lengths[pile_index_candidate] > 0;
-                            if is_valid {
+                            let candidate_pile_length = pile_lengths[pile_index_candidate];
+
+                            if candidate_pile_length > 0 {
                                 if let Some(prev_card_index) = self.card_index {
-                                    let is_still_valid =
-                                        pile_lengths.get(prev_card_index).is_some();
+                                    let is_still_valid = prev_card_index < candidate_pile_length;
+
                                     if is_still_valid {
                                         // Just update the pile_index. card_index is still good
                                         self.pile_index = Some(pile_index_candidate);
