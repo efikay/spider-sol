@@ -71,11 +71,11 @@ fn make_ascii_card(params: MakeAsciiCardParams) -> Text {
         is_last,
     } = params;
 
-    let style = get_style_by_highlight(is_highlighted);
+    let border_style = get_border_style_by_highlight(is_highlighted);
 
     if card.is_opened {
         make_ascii_opened_card(MakeAsciiOpenedCardParams {
-            style,
+            border_style,
             is_last,
             rank: card.rank.to_human(),
             suit: card.suit.symbol().into(),
@@ -84,7 +84,7 @@ fn make_ascii_card(params: MakeAsciiCardParams) -> Text {
     } else {
         make_ascii_closed_card(&MakeAsciiClosedCardParams {
             is_last,
-            style,
+            border_style,
             card_back_style: Style::default().fg(Color::Green),
         })
     }
@@ -92,7 +92,7 @@ fn make_ascii_card(params: MakeAsciiCardParams) -> Text {
 
 /// ----- ASCII opened card ----- ///
 struct MakeAsciiOpenedCardParams {
-    pub style: Style,
+    pub border_style: Style,
     pub is_last: bool,
     pub rank: String,
     pub suit: String,
@@ -100,16 +100,16 @@ struct MakeAsciiOpenedCardParams {
 }
 fn make_ascii_opened_card(params: MakeAsciiOpenedCardParams) -> Text<'static> {
     let MakeAsciiOpenedCardParams {
-        style,
+        border_style,
         is_last,
         rank,
         suit,
         suit_style,
     } = params;
 
-    let top_line = Line::from("┌─────┐").style(style);
-    let wall = Span::styled("│", style);
-    let bottom_line = Line::from("└─────┘").style(style);
+    let top_line = Line::from("┌─────┐").style(border_style);
+    let wall = Span::styled("│", border_style);
+    let bottom_line = Line::from("└─────┘").style(border_style);
 
     if is_last {
         Text::from(vec![
@@ -148,26 +148,26 @@ fn make_ascii_opened_card(params: MakeAsciiOpenedCardParams) -> Text<'static> {
 
 /// ----- ASCII closed card ----- ///
 struct MakeAsciiClosedCardParams {
-    pub style: Style,
+    pub border_style: Style,
     pub card_back_style: Style,
     pub is_last: bool,
 }
 fn make_ascii_closed_card(params: &MakeAsciiClosedCardParams) -> Text<'static> {
     let MakeAsciiClosedCardParams {
-        style,
+        border_style,
         card_back_style,
         is_last,
     } = *params;
 
-    let top_line = Line::from("┌─────┐").style(style);
+    let top_line = Line::from("┌─────┐").style(border_style);
     let card_back_line = Line::from(vec![
-        Span::styled("│", style),
+        Span::styled("│", border_style),
         Span::styled("░░░░░", card_back_style),
-        Span::styled("│", style),
+        Span::styled("│", border_style),
     ]);
 
     if is_last {
-        let bottom_line = Line::from("└─────┘").style(style);
+        let bottom_line = Line::from("└─────┘").style(border_style);
 
         Text::from(vec![
             top_line,
@@ -176,15 +176,15 @@ fn make_ascii_closed_card(params: &MakeAsciiClosedCardParams) -> Text<'static> {
             card_back_line,
             bottom_line,
         ])
-        .style(style)
+        .style(border_style)
     } else {
-        Text::from(vec![top_line, card_back_line]).style(style)
+        Text::from(vec![top_line, card_back_line]).style(border_style)
     }
 }
 
 
 /// ---------- Styling & colors ---------- ///
-fn get_style_by_highlight(is_highlighted: bool) -> Style {
+fn get_border_style_by_highlight(is_highlighted: bool) -> Style {
     if is_highlighted {
         Style::new().add_modifier(Modifier::BOLD)
     } else {
