@@ -220,7 +220,9 @@ impl GameCursor {
                 match self.pile_index {
                     Some(pile_index) => {
                         match self.card_index {
-                            Some(max_card_index) if max_card_index == pile_lengths[pile_index] => {
+                            Some(max_card_index)
+                                if max_card_index == pile_lengths[pile_index] - 1 =>
+                            {
                                 // No-no-no...
                                 // TODO: Try to "teleport" to up-most card?
                             }
@@ -458,19 +460,13 @@ mod tests {
         assert_eq!(cursor.card_index, Some(3));
         assert_eq!(cursor.pile_index, Some(0));
         cursor.move_down();
-        assert_eq!(cursor.card_index, Some(4));
+        assert_eq!(cursor.card_index, Some(3));
         assert_eq!(cursor.pile_index, Some(0));
         cursor.move_down();
-        assert_eq!(cursor.card_index, Some(4));
-        assert_eq!(cursor.pile_index, Some(0));
-        cursor.move_down();
-        assert_eq!(cursor.card_index, Some(4));
+        assert_eq!(cursor.card_index, Some(3));
         assert_eq!(cursor.pile_index, Some(0));
 
         // Stairwayyy to heaven
-        cursor.move_up();
-        assert_eq!(cursor.card_index, Some(3));
-        assert_eq!(cursor.pile_index, Some(0));
         cursor.move_up();
         assert_eq!(cursor.card_index, Some(2));
         assert_eq!(cursor.pile_index, Some(0));
