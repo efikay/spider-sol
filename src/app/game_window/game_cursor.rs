@@ -39,6 +39,9 @@ pub struct GameCursor {
     pile_index: Option<usize>,
     // Cursor (up-down) position
     card_index: Option<usize>,
+
+    saved_card_index: Option<usize>,
+    saved_pile_index: Option<usize>,
 }
 
 impl GameCursor {
@@ -47,6 +50,8 @@ impl GameCursor {
             mode: None,
             pile_index: None,
             card_index: None,
+            saved_card_index: None,
+            saved_pile_index: None,
         }
     }
     pub fn mode(&self) -> &Option<GameCursorMode> {
@@ -57,6 +62,41 @@ impl GameCursor {
     }
     pub fn card_index(&self) -> Option<usize> {
         self.card_index
+    }
+
+    pub fn save_card_position(&mut self) -> Result<(), ()> {
+        if let (Some(card_index), Some(pile_index)) = (self.card_index, self.pile_index) {
+            self.saved_card_index = Some(card_index);
+            self.saved_pile_index = Some(pile_index);
+
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+
+    pub fn pop_saved_card_position(&mut self) -> Result<(usize, usize), ()> {
+        if let Some(saved_position) = self.get_saved_card_position() {
+            self.reset_saved_card_position();
+
+            Ok(saved_position)
+        } else {
+            Err(())
+        }
+    }
+
+    pub fn get_saved_card_position(&self) -> Option<(usize, usize)> {
+        if let (Some(card_index), Some(pile_index)) = (self.saved_card_index, self.saved_pile_index)
+        {
+            Some((card_index, pile_index))
+        } else {
+            None
+        }
+    }
+
+    pub fn reset_saved_card_position(&mut self) {
+        self.saved_card_index = None;
+        self.saved_pile_index = None;
     }
 
     pub fn update_constraints(&mut self, constraints: [usize; PILES_AMOUNT]) {
@@ -76,6 +116,7 @@ impl GameCursor {
     pub fn set_for_card_selection(&mut self, constraints: [usize; PILES_AMOUNT]) {
         self.mode = Some(GameCursorMode::CardSelect(constraints));
 
+        self.reset_saved_card_position();
         self.recalc_cursor_position();
     }
 

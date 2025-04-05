@@ -5,7 +5,7 @@ use ratatui::{
     Frame,
     layout::{Constraint, Layout, Margin, Position, Rect},
     style::{Color, Style},
-    text::Text,
+    text::{Line, Text},
     widgets::{Block, Paragraph},
 };
 
@@ -22,9 +22,6 @@ pub struct GameWindow<CardStockT: ICardStock> {
     game_engine: GameEngine<CardStockT>,
 
     cursor: GameCursor,
-    // TODO: move those indexes to cursor
-    selected_card_index: Option<usize>,
-    selected_card_pile_index: Option<usize>,
 }
 
 impl<CardStockT: ICardStock> GameWindow<CardStockT> {
@@ -37,21 +34,21 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         Self {
             game_engine,
             cursor,
-            selected_card_index: None,
-            selected_card_pile_index: None,
         }
     }
 
-    fn deal_cards(&mut self) {
-        self.game_engine.deal_cards();
-    }
     fn deals_left(&self) -> usize {
         self.game_engine.deals_left()
     }
     fn can_deal_cards(&mut self) -> bool {
         match self.cursor.mode() {
-            Some(GameCursorMode::CardSelect(_)) => self.game_engine.deals_left() > 0,
+            Some(GameCursorMode::CardSelect(_)) => self.deals_left() > 0,
             _ => false,
+        }
+    }
+    fn deal_cards(&mut self) {
+        if self.can_deal_cards() {
+            self.game_engine.deal_cards();
         }
     }
 
@@ -68,22 +65,13 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         }
     }
 
-    fn select_current_cursor_position_card(&mut self) -> Result<(), ()> {
-        if let (Some(cursor_card_idx), Some(cursor_pile_idx)) =
-            (self.cursor.card_index(), self.cursor.pile_index())
-        {
-            self.selected_card_pile_index = Some(cursor_pile_idx);
-            self.selected_card_index = Some(cursor_card_idx);
-            Ok(())
-        } else {
-            Err(())
-        }
+    fn save_current_cursor_position(&mut self) -> Result<(), ()> {
+        self.cursor.save_card_position()
     }
 
     fn attempt_to_place_selected_card_to_current_cursor_position(&mut self) -> Result<(), ()> {
-        if let (Some(selected_card_idx), Some(selected_card_pile_idx), Some(target_pile_idx)) = (
-            self.selected_card_index,
-            self.selected_card_pile_index,
+        if let (Some((selected_card_idx, selected_card_pile_idx)), Some(target_pile_idx)) = (
+            self.cursor.get_saved_card_position(),
             self.cursor.pile_index(),
         ) {
             let is_target_pile_empty = {
@@ -159,7 +147,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
     }
     fn on_enter_pressed(&mut self) {
         if self.is_selecting_a_card() {
-            if let Ok(_) = self.select_current_cursor_position_card() {
+            if let Ok(_) = self.save_current_cursor_position() {
                 self.cursor
                     .set_for_pile_selection(self.calc_playable_card_lengths());
             }
@@ -199,16 +187,30 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             .split(frame.area());
         {
             let text_area = areas[0];
-            let text = Text::from(format!(
-                "Deals left: {} {}| <q> - exit || Complete sequences - {}",
-                self.game_engine.deals_left(),
-                if self.can_deal_cards() {
-                    "| <d> - Take deal "
-                } else {
-                    ""
-                },
-                self.game_engine.complete_sequences_count()
-            ));
+            let text = Text::from(vec![
+                Line::from(format!(
+                    "Deals left: {} {}{}| <q> - exit || Complete sequences - {}",
+                    self.game_engine.deals_left(),
+                    if self.can_deal_cards() {
+                        "| <d> - Take deal "
+                    } else {
+                        ""
+                    },
+                    if self.is_selecting_a_card() {
+                        "| Select card(-s) "
+                    } else if self.is_placing_a_card() {
+                        "| Choose a pile to place card(-s) "
+                    } else {
+                        "| <Err> "
+                    },
+                    self.game_engine.complete_sequences_count(),
+                )),
+                Line::from(format!(
+                    "<DEBUG>: saved_cursor_position={:?}, cursor_position={:?}",
+                    self.cursor.get_saved_card_position(),
+                    (self.cursor.card_index(), self.cursor.pile_index())
+                )),
+            ]);
 
             let paragraph = Paragraph::new(text)
                 .block(Block::bordered())
