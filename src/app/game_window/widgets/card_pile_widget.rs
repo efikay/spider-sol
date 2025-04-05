@@ -1,7 +1,7 @@
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
-    style::{Color, Modifier, Style},
+    style::{Modifier, Style},
     text::{Line, Span, Text},
     widgets::{List, StatefulWidget, Widget},
 };
@@ -13,7 +13,6 @@ use crate::{
 
 #[derive(Clone, Copy)]
 pub struct CardPileWidget {
-    // TODO: Make specific struct for CardPileWidgetState and move cursor there
     cursor: GameCursor,
 }
 
@@ -25,7 +24,7 @@ impl CardPileWidget {
 
 /// ------ Render ------ ///
 impl StatefulWidget for CardPileWidget {
-    // TODO: Change to Card slice?
+    // TODO: Change to struct containing Card slice and necessary data only?
     type State = CardPileV2;
 
     fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State)
