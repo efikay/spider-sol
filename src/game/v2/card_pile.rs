@@ -28,6 +28,9 @@ impl CardPileV2 {
         Self { index, cards }
     }
 
+    pub fn cards(&self) -> &[Card] {
+        &self.cards
+    }
     pub fn is_empty(&self) -> bool {
         self.cards.is_empty()
     }
