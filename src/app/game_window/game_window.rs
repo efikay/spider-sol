@@ -86,14 +86,13 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             self.selected_card_pile_index,
             self.cursor.pile_index(),
         ) {
-
             let is_target_pile_empty = {
                 let tableau = &self.game_engine.tableau();
                 let tableau = tableau.borrow();
-    
+
                 let piles = tableau.piles();
                 let piles = piles.borrow();
-    
+
                 piles[target_pile_idx].is_empty()
             };
 
@@ -129,8 +128,18 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             .unwrap()
     }
     fn update_cursor_constraints(&mut self) {
-        self.cursor
-            .update_constraints(self.calc_playable_card_lengths());
+        match self.cursor.mode() {
+            Some(GameCursorMode::CardSelect(_)) => {
+                self.cursor
+                    .update_constraints(self.calc_playable_card_lengths());
+            }
+            Some(GameCursorMode::PileSelect(_)) => {
+                let all_piles_available = std::array::from_fn(|_| 1);
+
+                self.cursor.update_constraints(all_piles_available);
+            }
+            _ => {}
+        }
     }
 
     // -- Keys -- //
