@@ -180,9 +180,16 @@ impl CardPileV2 {
         let sequences = self.seqs();
 
         if let Some(last_seq) = sequences.last() {
-            assert!(last_seq.iter().all(|c| c.is_opened));
+            // Skipping closed cards
+            let closed_cards_count =
+                last_seq.iter().fold(
+                    0_usize,
+                    |acc, card| {
+                        if !card.is_opened { acc + 1 } else { acc }
+                    },
+                );
 
-            last_seq
+            &last_seq[closed_cards_count..]
         } else {
             &NO_CARDS
         }
@@ -383,6 +390,30 @@ mod tests {
             Ok(())
         );
         assert_eq!(pile.seqs().len(), 1);
+    }
+
+    #[test]
+    fn should_not_include_closed_cards_in_playable() {
+        let pile = CardPileV2::from_cards(
+            vec![
+                Card::new(Rank::Six, Suit::Spades),
+                Card::new(Rank::Five, Suit::Spades),
+                Card::new_opened(Rank::Four, Suit::Spades),
+                Card::new_opened(Rank::Three, Suit::Spades),
+                Card::new_opened(Rank::Two, Suit::Spades),
+                Card::new_opened(Rank::Ace, Suit::Spades),
+            ],
+            0,
+        );
+
+        let expected = &[
+            Card::new_opened(Rank::Four, Suit::Spades),
+            Card::new_opened(Rank::Three, Suit::Spades),
+            Card::new_opened(Rank::Two, Suit::Spades),
+            Card::new_opened(Rank::Ace, Suit::Spades),
+        ][..];
+
+        assert_eq!(pile.playable_cards(), expected);
     }
 
     #[test]
