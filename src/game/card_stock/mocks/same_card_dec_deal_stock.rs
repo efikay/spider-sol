@@ -9,9 +9,9 @@ pub struct SameCardDecDealStock {
 }
 
 impl SameCardDecDealStock {
-    pub fn new(starting_rank: Rank) -> Self {
+    pub fn new() -> Self {
         Self {
-            rank: starting_rank,
+            rank: Rank::King,
         }
     }
 }

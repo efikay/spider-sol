@@ -11,7 +11,7 @@ use crate::game::{
 };
 
 pub fn console_debug_deals() {
-    let mut game = GameEngine::new(SameCardDecDealStock::new(Rank::Queen));
+    let mut game = GameEngine::new(SameCardDecDealStock::new());
 
     println!("Game started (aces start, same card++ deals)");
     while game.deals_left() > 0 {
