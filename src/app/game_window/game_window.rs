@@ -88,43 +88,31 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         }
     }
     fn on_enter_pressed(&mut self) {
+        let playable_card_lengths = self
+            .game_engine
+            .tableau()
+            .borrow()
+            .piles()
+            .borrow()
+            .iter()
+            .map(|pile| pile.playable_cards_len())
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap();
+
         if self.is_selecting_a_card() {
             // TODO: Select a card by:
             // - Taking `cursor` position, then
             // - Finding a card in `game_engine`
             // - Save the card
 
-            let pile_filters = self
-                .game_engine
-                .tableau()
-                .borrow()
-                .piles()
-                .borrow()
-                .iter()
-                .map(|pile| !pile.is_empty())
-                .collect::<Vec<_>>()
-                .try_into()
-                .unwrap();
-
-            self.cursor.set_for_pile_selection(pile_filters);
+            self.cursor.set_for_pile_selection(playable_card_lengths);
         } else if self.is_selecting_a_pile() {
             // TODO: Perform a move by:
             // - Taking `cursor` position, then (one of):
             //   - (OR) Create a `CardMove` based on saved Card, cursor position and pile.is_empty() state
             //   - (OR) Find previously(todo?) saved available move based on such data
             // - Then, perform a move through game_engine
-
-            let playable_card_lengths = self
-                .game_engine
-                .tableau()
-                .borrow()
-                .piles()
-                .borrow()
-                .iter()
-                .map(|pile| pile.playable_cards_len())
-                .collect::<Vec<_>>()
-                .try_into()
-                .unwrap();
 
             self.cursor.set_for_card_selection(playable_card_lengths);
         }

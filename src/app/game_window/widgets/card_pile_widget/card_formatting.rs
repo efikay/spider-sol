@@ -35,7 +35,9 @@ pub fn make_card_pile_ascii_cards<'a>(
                     false,
                 )
             }
-            Some(GameCursorMode::PileSelect(piles_filter)) => (None, piles_filter[this_pile_index]),
+            Some(GameCursorMode::PileSelect(piles_filter)) => {
+                (None, piles_filter[this_pile_index] > 0)
+            }
             _ => (None, false),
         },
         _ => (None, false),
@@ -181,7 +183,6 @@ fn make_ascii_closed_card(params: &MakeAsciiClosedCardParams) -> Text<'static> {
         Text::from(vec![top_line, card_back_line]).style(border_style)
     }
 }
-
 
 /// ---------- Styling & colors ---------- ///
 fn get_border_style_by_highlight(is_highlighted: bool) -> Style {

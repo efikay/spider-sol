@@ -19,16 +19,16 @@ pub enum GameCursorMode {
 
     /// Cursor used to drop selected card across pile-indexes that are true
     ///
-    /// Value represents each pile availability to move in
+    /// Value > 0 means that pile is available to move in
     ///
     /// Example: (let's assume that PILES_AMOUNT=4)
     ///
-    /// GameCursorMode::PlaceCard(vec![true,true,false,true]) means that:
+    /// GameCursorMode::PlaceCard(vec![1,3,0,8]) means that:
     /// - you can drop selected card on first pile
     /// - you also can drop card on second pile
     /// - you cannot drop a card to third pile
     /// - you're welcome to drop a card on last pile
-    PileSelect([bool; PILES_AMOUNT]),
+    PileSelect([usize; PILES_AMOUNT]),
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -65,7 +65,7 @@ impl GameCursor {
         self.recalc_cursor_position();
     }
 
-    pub fn set_for_pile_selection(&mut self, constraints: [bool; PILES_AMOUNT]) {
+    pub fn set_for_pile_selection(&mut self, constraints: [usize; PILES_AMOUNT]) {
         self.mode = Some(GameCursorMode::PileSelect(constraints));
 
         self.recalc_cursor_position();
@@ -106,17 +106,17 @@ impl GameCursor {
                     }
                 }
             }
-            Some(GameCursorMode::PileSelect(pile_filters)) => {
+            Some(GameCursorMode::PileSelect(pile_lengths)) => {
                 match self.pile_index {
                     None => {
-                        assert!(pile_filters.iter().all(|filter| !filter))
+                        assert!(pile_lengths.iter().all(|filter| *filter == 0))
                     }
                     Some(0) => {
                         // TODO: try moving to most-right?
                     }
                     Some(pile_index) => {
                         for pile_index_candidate in (0..pile_index).rev() {
-                            let is_valid = pile_filters[pile_index_candidate];
+                            let is_valid = pile_lengths[pile_index_candidate] > 0;
                             if is_valid {
                                 self.pile_index = Some(pile_index_candidate);
                                 return;
@@ -165,17 +165,17 @@ impl GameCursor {
                     }
                 }
             }
-            Some(GameCursorMode::PileSelect(pile_filters)) => {
+            Some(GameCursorMode::PileSelect(pile_lengths)) => {
                 match self.pile_index {
                     None => {
-                        assert!(pile_filters.iter().all(|filter| !filter))
+                        assert!(pile_lengths.iter().all(|filter| *filter == 0))
                     }
                     Some(max_index) if max_index == (PILES_AMOUNT - 1) => {
                         // TODO: try moving to most-left?
                     }
                     Some(pile_index) => {
                         for pile_index_candidate in (pile_index + 1)..PILES_AMOUNT {
-                            let is_valid = pile_filters[pile_index_candidate];
+                            let is_valid = pile_lengths[pile_index_candidate] > 0;
                             if is_valid {
                                 self.pile_index = Some(pile_index_candidate);
                                 return;
@@ -262,8 +262,8 @@ impl GameCursor {
 
     fn recalc_pile_index(&mut self) {
         let pile_filters = match &self.mode {
-            Some(GameCursorMode::CardSelect(pile_sizes)) => &pile_sizes.map(|len| len > 0),
-            Some(GameCursorMode::PileSelect(pile_validities)) => pile_validities,
+            Some(GameCursorMode::CardSelect(pile_lengths)) => &pile_lengths.map(|len| len > 0),
+            Some(GameCursorMode::PileSelect(pile_lengths)) => &pile_lengths.map(|len| len > 0),
             None => {
                 return;
             }
@@ -339,8 +339,9 @@ mod tests {
 
     #[test]
     fn should_set_up_correctly() {
+        let pile_lengths: [usize; PILES_AMOUNT] = [1, 1, 1, 1];
+
         {
-            let pile_lengths: [usize; PILES_AMOUNT] = [1, 1, 1, 1];
             let mut cursor = GameCursor::new();
 
             cursor.set_for_card_selection(pile_lengths);
@@ -349,11 +350,10 @@ mod tests {
             assert_eq!(cursor.card_index, Some(0));
         }
 
-        let pile_filters = [true, true, true, true];
         let mut cursor = GameCursor::new();
 
-        cursor.set_for_pile_selection(pile_filters);
-        assert_eq!(cursor.mode, Some(GameCursorMode::PileSelect(pile_filters)));
+        cursor.set_for_pile_selection(pile_lengths);
+        assert_eq!(cursor.mode, Some(GameCursorMode::PileSelect(pile_lengths)));
         assert_eq!(cursor.pile_index, Some(0));
         assert_eq!(cursor.card_index, None); // Should stay untouched
     }
@@ -361,7 +361,6 @@ mod tests {
     #[test]
     fn should_move_right_left_correctly() {
         let pile_lengths: [usize; PILES_AMOUNT] = [1, 1, 1, 1];
-        let pile_filters = pile_lengths.map(|p| p > 0);
 
         let mut cursor = GameCursor::new();
 
@@ -397,8 +396,8 @@ mod tests {
         assert_eq!(cursor.pile_index, Some(0));
 
         // And now we're trying pile mode
-        cursor.set_for_pile_selection(pile_filters);
-        assert_eq!(cursor.mode, Some(GameCursorMode::PileSelect(pile_filters)));
+        cursor.set_for_pile_selection(pile_lengths);
+        assert_eq!(cursor.mode, Some(GameCursorMode::PileSelect(pile_lengths)));
         assert_eq!(cursor.pile_index, Some(0));
         assert_eq!(cursor.card_index, Some(0)); // Should stay untouched
 
@@ -440,7 +439,6 @@ mod tests {
     #[test]
     fn should_move_up_down_correctly() {
         let pile_lengths: [usize; PILES_AMOUNT] = [4, 0, 0, 0];
-        let pile_filters = pile_lengths.map(|p| p > 0);
 
         let mut cursor = GameCursor::new();
 
@@ -486,7 +484,7 @@ mod tests {
         assert_eq!(cursor.pile_index, Some(0));
 
         // Very funny... It cannot move up-down but let's test it out!
-        cursor.set_for_pile_selection(pile_filters);
+        cursor.set_for_pile_selection(pile_lengths);
 
         // Go spam UP button once
         cursor.move_right();
@@ -505,7 +503,6 @@ mod tests {
     #[test]
     fn should_jump_over_empty_piles() {
         let pile_lengths: [usize; PILES_AMOUNT] = [5, 0, 0, 1];
-        let pile_filters = pile_lengths.map(|p| p > 0);
 
         let mut cursor = GameCursor::new();
 
@@ -516,7 +513,7 @@ mod tests {
         cursor.move_left();
         assert_eq!(cursor.pile_index, Some(0));
 
-        cursor.set_for_pile_selection(pile_filters);
+        cursor.set_for_pile_selection(pile_lengths);
 
         cursor.move_right();
         assert_eq!(cursor.pile_index, Some(3));
