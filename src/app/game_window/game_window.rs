@@ -171,7 +171,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         }
     }
     fn on_d_pressed(&mut self) {
-        if !self.is_placing_a_card() && self.game_engine.deals_left() > 0 {
+        if !self.is_placing_a_card() && self.deals_left() > 0 {
             self.deal_cards();
         }
     }
