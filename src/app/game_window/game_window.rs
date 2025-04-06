@@ -193,6 +193,13 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         self.game_engine.search_and_update_complete_sequences();
         self.update_cursor_constraints();
 
+        if self.game_engine.is_won() {
+            return frame.render_widget(
+                Paragraph::new("YOU WIN! PRESS <Q> TO QUIT THE GAME"),
+                frame.area(),
+            );
+        }
+
         let areas = Layout::vertical([Constraint::Percentage(10), Constraint::Percentage(90)])
             .split(frame.area());
         {
