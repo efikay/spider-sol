@@ -7,4 +7,6 @@ edition = "2024"
 strum = "0.27"
 strum_macros = "0.27"
 rand = "0.9"
-crossterm = "0.28"    # For console debug
+color-eyre = "0.6.3"
+crossterm = "0.28.1"
+ratatui = "0.29.0"

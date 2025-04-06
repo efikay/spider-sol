@@ -15,24 +15,7 @@ use crate::{
 };
 
 pub fn console_debug_moves() {
-    let mut game = GameEngine::from_tableau_and_stock(
-        GameTableau::new(vec![
-            Card::new_opened(Rank::Ace, Suit::Hearts),
-            Card::new_opened(Rank::Two, Suit::Hearts),
-            Card::new_opened(Rank::Three, Suit::Hearts),
-            Card::new_opened(Rank::Four, Suit::Hearts),
-            Card::new_opened(Rank::Five, Suit::Hearts),
-            Card::new_opened(Rank::Six, Suit::Hearts),
-            Card::new_opened(Rank::Seven, Suit::Hearts),
-            Card::new_opened(Rank::Eight, Suit::Hearts),
-            Card::new_opened(Rank::Nine, Suit::Hearts),
-            Card::new_opened(Rank::Ten, Suit::Hearts),
-            Card::new_opened(Rank::Jack, Suit::Hearts),
-            Card::new_opened(Rank::Queen, Suit::Hearts),
-            Card::new_opened(Rank::King, Suit::Hearts),
-        ]),
-        CardIncCycleInfiniteStock::new(Rank::Two),
-    );
+    let mut game = GameEngine::new(CardIncCycleInfiniteStock::new(Rank::Two));
 
     println!("Game started (game_moves, card+++ deals)");
     while game.deals_left() > 0 {

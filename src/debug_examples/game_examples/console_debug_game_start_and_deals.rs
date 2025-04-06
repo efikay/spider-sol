@@ -11,7 +11,7 @@ use crate::game::{
 };
 
 pub fn console_debug_game_start_and_deals() {
-    let stock = CardDeckStock::new(CardDeck::new(GameMode::FourSuits));
+    let stock = CardDeckStock::new(GameMode::FourSuits);
     let mut game = GameEngine::new(stock);
 
     println!("Game started, FourSuits mode");

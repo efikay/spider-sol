@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use core::fmt;
+use std::{cell::RefCell, rc::Rc};
 
 use super::{
     core::{COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT},
@@ -9,21 +10,33 @@ use super::{
 use crate::game::core::Card;
 
 pub struct GameTableau {
-    piles: [CardPileV2; PILES_AMOUNT],
+    piles: Rc<RefCell<[CardPileV2; PILES_AMOUNT]>>,
 }
 
 impl GameTableau {
     pub fn new(initial_cards: Vec<Card>) -> Self {
-        let piles = GameTableau::init_piles(initial_cards);
+        Self {
+            piles: GameTableau::init_piles(initial_cards),
+        }
+    }
+    pub fn from_piles(piles: [CardPileV2; PILES_AMOUNT]) -> Self {
+        let piles = Rc::new(RefCell::new(piles));
 
         Self { piles }
     }
-    pub fn from_piles(piles: [CardPileV2; PILES_AMOUNT]) -> Self {
-        Self { piles }
+    pub fn from_empty_piles() -> Self {
+        Self {
+            piles: Rc::new(RefCell::new(CardPileV2::init_piles())),
+        }
+    }
+
+    pub fn piles(&self) -> Rc<RefCell<[CardPileV2; PILES_AMOUNT]>> {
+        Rc::clone(&self.piles)
     }
 
     pub fn take_deal(&mut self, cards: Vec<Card>) {
         self.piles
+            .borrow_mut()
             .iter_mut()
             .zip(cards.iter())
             .for_each(|(pile, card)| {
@@ -34,7 +47,7 @@ impl GameTableau {
     pub fn extract_complete_sequences(&mut self) -> Vec<[Card; COMPLETE_SEQUENCE_LENGTH]> {
         let mut complete_sequences = vec![];
 
-        for pile in &mut self.piles {
+        for pile in self.piles.borrow_mut().iter_mut() {
             if let Some(complete_seq) = pile.try_extract_complete_sequence() {
                 complete_sequences.push(complete_seq);
             }
@@ -43,21 +56,21 @@ impl GameTableau {
         complete_sequences
     }
 
-    fn init_piles(cards: Vec<Card>) -> [CardPileV2; PILES_AMOUNT] {
+    fn init_piles(cards: Vec<Card>) -> Rc<RefCell<[CardPileV2; PILES_AMOUNT]>> {
         let mut pile_cards = CardPileV2::init_piles();
 
         cards.into_iter().enumerate().for_each(|(index, card)| {
             pile_cards[index % PILES_AMOUNT].add_start_card(card);
         });
 
-        pile_cards
+        Rc::new(RefCell::new(pile_cards))
     }
 
     pub fn calculate_available_moves(&self) -> Vec<CardMove> {
         let mut available_moves = vec![];
 
-        for pile in &self.piles {
-            for other_pile in &self.piles {
+        for pile in self.piles.borrow().iter() {
+            for other_pile in self.piles.borrow().iter() {
                 if other_pile == pile {
                     continue;
                 }
@@ -71,9 +84,9 @@ impl GameTableau {
 
     pub fn perform_move(&mut self, card_move: CardMove) -> Result<(), ()> {
         let src_pile: &mut CardPileV2 =
-            unsafe { &mut *(&mut self.piles[card_move.src_pile()] as *mut _) };
+            unsafe { &mut *(&mut self.piles.borrow_mut()[card_move.src_pile()] as *mut _) };
         let dest_pile: &mut CardPileV2 =
-            unsafe { &mut *(&mut self.piles[card_move.dest_pile()] as *mut _) };
+            unsafe { &mut *(&mut self.piles.borrow_mut()[card_move.dest_pile()] as *mut _) };
 
         match card_move.move_type() {
             CardMoveType::OnEmptyPile(src_card) => {
@@ -89,7 +102,7 @@ impl fmt::Display for GameTableau {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "<GameTableau>")?;
         writeln!(f, "Piles:")?;
-        for (i, pile) in self.piles.iter().enumerate() {
+        for (i, pile) in self.piles.borrow().iter().enumerate() {
             write!(f, "\t Pile {}:", i)?;
             writeln!(f, "{}", pile)?;
         }
