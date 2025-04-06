@@ -10,6 +10,8 @@
 ## Status
 Status: In development 🚧 🏁 (Basic TUI and game engine is rdy)
 
+![Alt Text](./game.gif)
+
 ## TODOs:
 1. (✅) Basic logic (each of):
   - [x] Card deck
