@@ -73,7 +73,7 @@ fn make_shuffled_game_mode_deck(game_mode: GameMode) -> Vec<Card> {
         GameMode::FourSuits => 2,
     };
     let suits = match game_mode {
-        GameMode::OneSuit => vec![Suit::Spades],
+        GameMode::OneSuit => vec![Suit::Diamonds],
         GameMode::TwoSuits => vec![Suit::Spades, Suit::Hearts],
         GameMode::FourSuits => Suit::iter().collect(),
     };
