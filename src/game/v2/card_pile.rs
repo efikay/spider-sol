@@ -59,6 +59,12 @@ impl CardPileV2 {
         self.cards.push(card);
     }
 
+    pub fn open_last_card(&mut self) {
+        if let Some(last_card) = self.cards.last_mut() {
+            last_card.is_opened = true;
+        }
+    }
+
     pub fn try_extract_complete_sequence(&mut self) -> Option<[Card; COMPLETE_SEQUENCE_LENGTH]> {
         let cards = self.playable_cards();
 
@@ -70,6 +76,8 @@ impl CardPileV2 {
                 Ok(arr) => arr,
                 Err(_) => panic!("Something is wrong :("),
             };
+
+            self.open_last_card();
 
             Some(std_cards)
         } else {
@@ -88,6 +96,7 @@ impl CardPileV2 {
             // TODO: Add specific method for better semantic
             target_pile.add_start_card(*card);
         }
+        self.open_last_card();
 
         Ok(())
     }
@@ -106,6 +115,7 @@ impl CardPileV2 {
                     // TODO: Add specific method for better semantic
                     target_pile.add_start_card(*card);
                 }
+                self.open_last_card();
 
                 Ok(())
             } else {
