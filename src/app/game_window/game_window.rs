@@ -4,7 +4,7 @@ use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Margin, Position, Rect},
-    style::{Color, Style},
+    style::{Color, Modifier, Style},
     text::{Line, Text},
     widgets::{Block, Paragraph},
 };
@@ -239,7 +239,13 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             let tableau_area = areas[1];
 
             // Surround the area with a border
-            frame.render_widget(Block::bordered(), tableau_area);
+            let border_block = if self.is_placing_a_card() {
+                Block::bordered().border_style(Style::new().add_modifier(Modifier::BOLD))
+            } else {
+                Block::bordered()
+            };
+
+            frame.render_widget(border_block, tableau_area);
             let tableau_area = tableau_area.inner(Margin {
                 horizontal: 2,
                 vertical: 1,
