@@ -84,12 +84,12 @@ impl WelcomeWindow {
             }
             // [Arrow navigation]
             (_, KeyCode::Left | KeyCode::Char('h') | KeyCode::Right | KeyCode::Char('l')) => None,
-            (_, KeyCode::Down | KeyCode::Char('j')) => {
+            (_, KeyCode::Down | KeyCode::Char('j') | KeyCode::Char('s')) => {
                 self.on_down_pressed();
 
                 None
             }
-            (_, KeyCode::Up | KeyCode::Char('k')) => {
+            (_, KeyCode::Up | KeyCode::Char('k') | KeyCode::Char('w')) => {
                 self.on_up_pressed();
 
                 None

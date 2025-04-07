@@ -56,7 +56,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
     fn deals_left(&self) -> usize {
         self.game_engine.deals_left()
     }
-    fn can_deal_cards(&mut self) -> bool {
+    fn can_deal_cards(&self) -> bool {
         match self.cursor.mode() {
             Some(GameCursorMode::CardSelect(_)) => self.deals_left() > 0 && !self.has_empty_piles(),
             _ => false,
@@ -155,16 +155,18 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
                 return Some(GameWindowKeyResult::StopTheGame);
             }
             // [Arrow navigation]
-            (_, KeyCode::Left | KeyCode::Char('h')) => self.on_left_pressed(),
-            (_, KeyCode::Down | KeyCode::Char('j')) => self.on_down_pressed(),
-            (_, KeyCode::Up | KeyCode::Char('k')) => self.on_up_pressed(),
-            (_, KeyCode::Right | KeyCode::Char('l')) => self.on_right_pressed(),
+            (_, KeyCode::Left | KeyCode::Char('h') | KeyCode::Char('a')) => self.on_left_pressed(),
+            (_, KeyCode::Down | KeyCode::Char('j') | KeyCode::Char('s')) => self.on_down_pressed(),
+            (_, KeyCode::Up | KeyCode::Char('k') | KeyCode::Char('w')) => self.on_up_pressed(),
+            (_, KeyCode::Right | KeyCode::Char('l') | KeyCode::Char('d')) => {
+                self.on_right_pressed()
+            }
             // [Deal cards]
-            (_, KeyCode::Char('d')) => self.on_d_pressed(),
+            (_, KeyCode::Char(' ')) => self.on_d_pressed(),
             // [Restart the game]
             (_, KeyCode::Char('r')) => return Some(GameWindowKeyResult::RestartTheGame),
             // [Select a card / Select a pile]
-            (_, KeyCode::Enter) => self.on_enter_pressed(),
+            (_, KeyCode::Enter | KeyCode::Tab) => self.on_action_pressed(),
             _ => {
                 // None
             }
@@ -172,7 +174,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
 
         None
     }
-    fn on_enter_pressed(&mut self) {
+    fn on_action_pressed(&mut self) {
         if self.is_selecting_a_card() {
             if let Ok(_) = self.save_current_cursor_position() {
                 self.cursor
@@ -221,18 +223,8 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             .split(frame.area());
         {
             let text_area = areas[0];
-            let text = Text::from(vec![Line::from(format!(
-                "Deals left: {} {}| <r> - restart the game | <q> - exit to menu || Complete sequences - {}",
-                self.game_engine.deals_left(),
-                if self.can_deal_cards() {
-                    "| <d> - Take deal "
-                } else {
-                    ""
-                },
-                self.game_engine.complete_sequences_count(),
-            ))]);
 
-            let paragraph = Paragraph::new(text)
+            let paragraph = Paragraph::new(self.make_info_text())
                 .block(Block::bordered())
                 .style(Style::default());
 
@@ -260,6 +252,30 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
                 &mut self.game_engine.tableau(),
             )
         }
+    }
+
+    fn make_info_text(&self) -> Text {
+        let deals_left_text = format!("Deals left: {}", self.deals_left());
+        let deal_hint = if self.can_deal_cards() {
+            "<tab|enter> – deal"
+        } else {
+            ".."
+        };
+        let restart_hint = "<r> – restart";
+        let exit_hint = "<q> – menu";
+        let sequences_text = format!(
+            "Complete sequences: - {}/8",
+            self.game_engine.complete_sequences_count()
+        );
+        let navigation_hint = "< wasd|hjkl|←↑↓→ > - navigation";
+
+        Text::from(vec![
+            Line::from(format!(
+                "{} | {} | {} | {}",
+                exit_hint, restart_hint, deal_hint, navigation_hint
+            )),
+            Line::from(format!("{} | {}", deals_left_text, sequences_text)),
+        ])
     }
 }
 
