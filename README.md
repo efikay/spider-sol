@@ -31,6 +31,7 @@ Status: In development 🚧 🏁 (Basic TUI and game engine is rdy)
 7. (todo) Realize some ideas that are nice
 
 ## Ideas
+- [ ] Card auto size (responsive layout) / Cards zipping (To make sure game ok at least terminal size as possible) + Check area size and calculate what's appropriate
 - [ ] help window (+shortcut)
 - [ ] full game configuration
 - [ ] cli params (use cli lib)
