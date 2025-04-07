@@ -5,12 +5,10 @@ use std::{cell::RefCell, rc::Rc};
 
 use super::{
     card_stock::ICardStock,
-    core::{COMPLETE_SEQUENCE_LENGTH, Card},
+    core::{COMPLETE_SEQUENCE_LENGTH, COMPLETE_SEQUENCES_TO_WIN, Card},
     v2::CardMove,
 };
 use crate::game::game_tableau::GameTableau;
-
-const COMPLETE_SEQUENCES_TO_WIN: usize = 8;
 
 pub struct GameEngine<CardStockT: ICardStock> {
     tableau: Rc<RefCell<GameTableau>>,

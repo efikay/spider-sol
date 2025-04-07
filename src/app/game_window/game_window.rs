@@ -5,12 +5,15 @@ use ratatui::{
     Frame,
     layout::{Constraint, Layout, Margin, Position, Rect},
     style::{Color, Modifier, Style},
-    text::{Line, Text},
+    text::{Line, Span, Text},
     widgets::{Block, Paragraph},
 };
 
 use crate::game::{
-    card_stock::ICardStock, core::PILES_AMOUNT, game_engine::GameEngine, v2::CardMoveBuilder,
+    card_stock::ICardStock,
+    core::{COMPLETE_SEQUENCES_TO_WIN, PILES_AMOUNT},
+    game_engine::GameEngine,
+    v2::CardMoveBuilder,
 };
 
 use super::{
@@ -261,7 +264,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         } else if self.is_selecting_a_card() {
             "<Space|Enter> – Take card"
         } else {
-            "(ノ ゜Д゜)ノ ︵ ┻━┻"
+            "ʕノ•ᴥ•ʔノ ︵ ┻━┻"
         };
         let deal_hint = if self.can_deal_cards() {
             "<Tab> – Take deal"
@@ -272,18 +275,44 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         let exit_hint = "<q> – menu";
         let navigation_hint = "wasd, hjkl, ←↑↓→ - navigation";
 
-        let deals_info = format!("Deals left: {}", self.deals_left());
-        let sequences_info = format!(
-            "Complete sequences: - {}/8",
-            self.game_engine.complete_sequences_count()
-        );
+        let bottom_line = {
+            let deal_icons = (0..self.deals_left())
+                .into_iter()
+                .map(|_| Span::from("🂡 "));
+            let complete_sequence_icons =
+                (0..COMPLETE_SEQUENCES_TO_WIN).into_iter().map(|index| {
+                    let is_sequence_complete = self.game_engine.complete_sequences_count() > index;
+
+                    Span::styled(
+                        "🂡 ",
+                        if is_sequence_complete {
+                            Style::new().add_modifier(Modifier::BOLD)
+                        } else {
+                            Style::new().add_modifier(Modifier::DIM)
+                        },
+                    )
+                });
+
+            let mut line = Line::default();
+
+            line.push_span(Span::from(" Stock: "));
+            if self.deals_left() > 0 {
+                line.extend(deal_icons);
+            } else {
+                line.push_span(Span::from("x⸑x "));
+            }
+            line.push_span(Span::from("| Complete sequences: "));
+            line.extend(complete_sequence_icons);
+
+            line
+        };
 
         Text::from(vec![
             Line::from(format!(
-                "{} | {} | {} | {} | {}",
+                " {} | {} | {} | {} | {}",
                 exit_hint, restart_hint, move_hint, deal_hint, navigation_hint
             )),
-            Line::from(format!("{} | {}", deals_info, sequences_info)),
+            bottom_line,
         ])
     }
 }

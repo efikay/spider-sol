@@ -5,3 +5,4 @@ pub const PILES_AMOUNT: usize = if cfg!(test) {
 };
 
 pub const COMPLETE_SEQUENCE_LENGTH: usize = 13;
+pub const COMPLETE_SEQUENCES_TO_WIN: usize = 8;
