@@ -219,8 +219,9 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             );
         }
 
-        let areas = Layout::vertical([Constraint::Percentage(10), Constraint::Percentage(90)])
+        let areas = Layout::vertical([Constraint::Min(4), Constraint::Percentage(100)])
             .split(frame.area());
+
         {
             let text_area = areas[0];
 
@@ -267,7 +268,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             "Complete sequences: - {}/8",
             self.game_engine.complete_sequences_count()
         );
-        let navigation_hint = "< wasd|hjkl|←↑↓→ > - navigation";
+        let navigation_hint = "wasd, hjkl, ←↑↓→ - navigation";
 
         Text::from(vec![
             Line::from(format!(
