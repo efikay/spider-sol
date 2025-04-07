@@ -14,16 +14,18 @@ use super::{
 pub struct App {
     is_running: bool,
 
-    game_window: Option<GameWindow<CardDeckStock>>,
     welcome_window: Option<WelcomeWindow>,
+    game_window: Option<GameWindow<CardDeckStock>>,
+    last_game_mode: Option<GameMode>,
 }
 
 impl App {
     pub fn new() -> App {
         Self {
             is_running: false,
-            game_window: None,
             welcome_window: Some(WelcomeWindow::new()),
+            game_window: None,
+            last_game_mode: None,
         }
     }
 
@@ -40,10 +42,22 @@ impl App {
 
     fn start_new_game(&mut self, game_mode: GameMode) {
         self.welcome_window = None;
+
         self.game_window = Some(GameWindow::new(CardDeckStock::new(game_mode)));
+        self.last_game_mode = Some(game_mode);
+    }
+    fn restart_the_game(&mut self) {
+        assert!(self.welcome_window.is_none());
+        assert!(self.last_game_mode.is_some());
+
+        self.game_window = Some(GameWindow::new(CardDeckStock::new(
+            self.last_game_mode.unwrap(),
+        )));
     }
     fn stop_the_game(&mut self) {
         self.game_window = None;
+        self.last_game_mode = None;
+
         self.welcome_window = Some(WelcomeWindow::new());
     }
 
@@ -83,6 +97,9 @@ impl App {
                 match key_result {
                     GameWindowKeyResult::StopTheGame => {
                         return self.stop_the_game();
+                    }
+                    GameWindowKeyResult::RestartTheGame => {
+                        return self.restart_the_game();
                     }
                 }
             }

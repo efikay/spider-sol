@@ -19,7 +19,10 @@ use super::{
 };
 
 pub enum GameWindowKeyResult {
+    // User wants to stop the game (go back to welcome screen)
     StopTheGame = 1,
+    // User wants to restart the game (with the same mode)
+    RestartTheGame,
 }
 pub struct GameWindow<CardStockT: ICardStock> {
     game_engine: GameEngine<CardStockT>,
@@ -158,6 +161,8 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             (_, KeyCode::Right | KeyCode::Char('l')) => self.on_right_pressed(),
             // [Deal cards]
             (_, KeyCode::Char('d')) => self.on_d_pressed(),
+            // [Restart the game]
+            (_, KeyCode::Char('r')) => return Some(GameWindowKeyResult::RestartTheGame),
             // [Select a card / Select a pile]
             (_, KeyCode::Enter) => self.on_enter_pressed(),
             _ => {

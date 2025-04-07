@@ -2,7 +2,7 @@
 
 use std::fmt;
 
-use crossterm::event::{KeyCode, KeyEvent};
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::{
     Frame,
     layout::{Alignment, Constraint, Direction, Layout},
@@ -77,6 +77,11 @@ impl WelcomeWindow {
     // -- Keys -- //
     pub fn on_key_pressed(&mut self, key: KeyEvent) -> Option<WelcomeWindowKeyResult> {
         match (key.modifiers, key.code) {
+            // [Exit the game]
+            (_, KeyCode::Esc | KeyCode::Char('q'))
+            | (KeyModifiers::CONTROL, KeyCode::Char('c') | KeyCode::Char('C')) => {
+                return Some(WelcomeWindowKeyResult::ExitGame);
+            }
             // [Arrow navigation]
             (_, KeyCode::Left | KeyCode::Char('h') | KeyCode::Right | KeyCode::Char('l')) => None,
             (_, KeyCode::Down | KeyCode::Char('j')) => {
