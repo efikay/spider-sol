@@ -25,10 +25,17 @@ Status: In development 🚧 🏁 (Basic TUI and game engine is rdy)
   - (✅) https://github.com/ratatui/ratatui
   - https://github.com/gyscos/cursive
 3. (✅) Basic TUI
-4. (todo) Advanced TUI
-5. (todo) Keyboard shortcuts, etc
-6. (todo) QoL features, auto-features
-7. (todo) Realize some ideas that are nice
+4. Undo functionality + keybind
+5. Hint functionality + keybind
+6. Advanced TUI:
+  - Splash screen
+  - Loading screens
+  - Popups and stuff, with relatively good UX
+  - UI autosize (shrink cards+else if window is small)
+7. Add more features (QoL/auto-features)
+8. CLI params
+9. (maybe) Other variants of solitaire?
+10. (always welcome) Realize some ideas that are nice
 
 ## Ideas
 - [ ] Card auto size (responsive layout) / Cards zipping (To make sure game ok at least terminal size as possible) + Check area size and calculate what's appropriate
