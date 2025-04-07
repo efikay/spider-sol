@@ -158,11 +158,9 @@ impl WelcomeWindow {
     }
 
     fn get_option_text(&self, option: WelcomeWindowCursorPosition) -> Text {
-        let as_str = option.to_string();
-
         match option == self.cursor_position {
-            true => Text::from(format!("→ {}", as_str)).add_modifier(Modifier::BOLD),
-            false => Text::from(format!("  {}", as_str)),
+            true => Text::from(format!("→ {}", option)).add_modifier(Modifier::BOLD),
+            false => Text::from(format!("  {}", option)),
         }
     }
 }
