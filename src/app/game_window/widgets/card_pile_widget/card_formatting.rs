@@ -215,7 +215,7 @@ fn make_ascii_closed_card(params: &MakeAsciiClosedCardParams) -> Text<'static> {
 fn calc_border_style(border_styling: BorderStyling) -> Style {
     match border_styling {
         BorderStyling::Default => Style::new(),
-        BorderStyling::Highlight => Style::new().fg(Color::LightYellow),
+        BorderStyling::Highlight => Style::new().fg(Color::LightMagenta),
         BorderStyling::Dim => Style::new().add_modifier(Modifier::DIM),
     }
 }
