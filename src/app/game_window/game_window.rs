@@ -153,7 +153,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
     pub fn on_key_pressed(&mut self, key: KeyEvent) -> Option<GameWindowKeyResult> {
         match (key.modifiers, key.code) {
             // [Stop the game]
-            (_, KeyCode::Esc | KeyCode::Char('q'))
+            (_, KeyCode::Char('q'))
             | (KeyModifiers::CONTROL, KeyCode::Char('c') | KeyCode::Char('C')) => {
                 return Some(GameWindowKeyResult::StopTheGame);
             }
@@ -166,6 +166,8 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             }
             // [Deal cards]
             (_, KeyCode::Tab) => self.on_tab_pressed(),
+            // [Cancel turn]
+            (_, KeyCode::Esc) => self.on_esc_pressed(),
             // [Restart the game]
             (_, KeyCode::Char('r')) => return Some(GameWindowKeyResult::RestartTheGame),
             // [Select a card / Select a pile]
@@ -176,6 +178,12 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         };
 
         None
+    }
+    fn on_esc_pressed(&mut self) {
+        if self.is_placing_a_card() {
+            self.cursor
+                .set_for_card_selection(self.calc_playable_card_lengths());
+        }
     }
     fn on_action_pressed(&mut self) {
         if self.is_selecting_a_card() {
@@ -276,22 +284,19 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         let navigation_hint = "wasd, hjkl, ←↑↓→ - navigation";
 
         let bottom_line = {
-            let deal_icons = (0..self.deals_left())
-                .into_iter()
-                .map(|_| Span::from("🂡 "));
-            let complete_sequence_icons =
-                (0..COMPLETE_SEQUENCES_TO_WIN).into_iter().map(|index| {
-                    let is_sequence_complete = self.game_engine.complete_sequences_count() > index;
+            let deal_icons = (0..self.deals_left()).into_iter().map(|_| Span::from("🂡 "));
+            let complete_sequence_icons = (0..COMPLETE_SEQUENCES_TO_WIN).into_iter().map(|index| {
+                let is_sequence_complete = self.game_engine.complete_sequences_count() > index;
 
-                    Span::styled(
-                        "🂡 ",
-                        if is_sequence_complete {
-                            Style::new().add_modifier(Modifier::BOLD)
-                        } else {
-                            Style::new().add_modifier(Modifier::DIM)
-                        },
-                    )
-                });
+                Span::styled(
+                    "🂡 ",
+                    if is_sequence_complete {
+                        Style::new().add_modifier(Modifier::BOLD)
+                    } else {
+                        Style::new().add_modifier(Modifier::DIM)
+                    },
+                )
+            });
 
             let mut line = Line::default();
 
