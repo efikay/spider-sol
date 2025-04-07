@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crossterm::event::{KeyCode, KeyEvent};
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Margin, Position, Rect},
@@ -18,6 +18,9 @@ use super::{
     widgets::TableauWidget,
 };
 
+pub enum GameWindowKeyResult {
+    StopTheGame = 1,
+}
 pub struct GameWindow<CardStockT: ICardStock> {
     game_engine: GameEngine<CardStockT>,
 
@@ -141,8 +144,13 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
     }
 
     // -- Keys -- //
-    pub fn on_key_pressed(&mut self, key: KeyEvent) {
+    pub fn on_key_pressed(&mut self, key: KeyEvent) -> Option<GameWindowKeyResult> {
         match (key.modifiers, key.code) {
+            // [Stop the game]
+            (_, KeyCode::Esc | KeyCode::Char('q'))
+            | (KeyModifiers::CONTROL, KeyCode::Char('c') | KeyCode::Char('C')) => {
+                return Some(GameWindowKeyResult::StopTheGame);
+            }
             // [Arrow navigation]
             (_, KeyCode::Left | KeyCode::Char('h')) => self.on_left_pressed(),
             (_, KeyCode::Down | KeyCode::Char('j')) => self.on_down_pressed(),
@@ -152,8 +160,12 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             (_, KeyCode::Char('d')) => self.on_d_pressed(),
             // [Select a card / Select a pile]
             (_, KeyCode::Enter) => self.on_enter_pressed(),
-            _ => {}
-        }
+            _ => {
+                // None
+            }
+        };
+
+        None
     }
     fn on_enter_pressed(&mut self) {
         if self.is_selecting_a_card() {
@@ -195,7 +207,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
 
         if self.game_engine.is_won() {
             return frame.render_widget(
-                Paragraph::new("YOU WIN! PRESS <Q> TO QUIT THE GAME"),
+                Paragraph::new("YOU WIN! PRESS <Q> TO exit to menu"),
                 frame.area(),
             );
         }
@@ -204,30 +216,16 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             .split(frame.area());
         {
             let text_area = areas[0];
-            let text = Text::from(vec![
-                Line::from(format!(
-                    "Deals left: {} {}{}| <q> - exit || Complete sequences - {}",
-                    self.game_engine.deals_left(),
-                    if self.can_deal_cards() {
-                        "| <d> - Take deal "
-                    } else {
-                        ""
-                    },
-                    if self.is_selecting_a_card() {
-                        "| Select card(-s) "
-                    } else if self.is_placing_a_card() {
-                        "| Choose a pile to place card(-s) "
-                    } else {
-                        "| <Err> "
-                    },
-                    self.game_engine.complete_sequences_count(),
-                )),
-                Line::from(format!(
-                    "<DEBUG>: saved_cursor_position={:?}, cursor_position={:?}",
-                    self.cursor.get_saved_card_position(),
-                    (self.cursor.card_index(), self.cursor.pile_index())
-                )),
-            ]);
+            let text = Text::from(vec![Line::from(format!(
+                "Deals left: {} {}| <r> - restart the game | <q> - exit to menu || Complete sequences - {}",
+                self.game_engine.deals_left(),
+                if self.can_deal_cards() {
+                    "| <d> - Take deal "
+                } else {
+                    ""
+                },
+                self.game_engine.complete_sequences_count(),
+            ))]);
 
             let paragraph = Paragraph::new(text)
                 .block(Block::bordered())

@@ -1,23 +1,29 @@
 #![allow(dead_code)]
 
 use color_eyre::Result;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
+use crossterm::event::{self, Event, KeyEvent, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
 
 use crate::game::{card_stock::CardDeckStock, core::GameMode};
 
-use super::game_window::GameWindow;
+use super::{
+    game_window::{GameWindow, GameWindowKeyResult},
+    welcome_window::{WelcomeWindow, WelcomeWindowKeyResult},
+};
 
 pub struct App {
     is_running: bool,
-    game_window: GameWindow<CardDeckStock>,
+
+    game_window: Option<GameWindow<CardDeckStock>>,
+    welcome_window: Option<WelcomeWindow>,
 }
 
 impl App {
     pub fn new() -> App {
         Self {
             is_running: false,
-            game_window: GameWindow::new(CardDeckStock::new(GameMode::TwoSuits)),
+            game_window: None,
+            welcome_window: Some(WelcomeWindow::new()),
         }
     }
 
@@ -32,8 +38,21 @@ impl App {
         Ok(())
     }
 
+    fn start_new_game(&mut self, game_mode: GameMode) {
+        self.welcome_window = None;
+        self.game_window = Some(GameWindow::new(CardDeckStock::new(game_mode)));
+    }
+    fn stop_the_game(&mut self) {
+        self.game_window = None;
+        self.welcome_window = Some(WelcomeWindow::new());
+    }
+
     fn render(&mut self, frame: &mut Frame) {
-        self.game_window.render_window(frame)
+        if let Some(window) = &self.welcome_window {
+            window.render_window(frame)
+        } else if let Some(window) = self.game_window.as_mut() {
+            window.render_window(frame)
+        }
     }
 
     fn handle_crossterm_events(&mut self) -> Result<()> {
@@ -48,12 +67,27 @@ impl App {
     }
 
     fn on_key_event(&mut self, key: KeyEvent) {
-        match (key.modifiers, key.code) {
-            // [Instant quit combinations]
-            (_, KeyCode::Esc | KeyCode::Char('q'))
-            | (KeyModifiers::CONTROL, KeyCode::Char('c') | KeyCode::Char('C')) => self.quit(),
-            // Add other key handlers here
-            _ => self.game_window.on_key_pressed(key),
+        if let Some(welcome_window) = self.welcome_window.as_mut() {
+            if let Some(key_result) = welcome_window.on_key_pressed(key) {
+                match key_result {
+                    WelcomeWindowKeyResult::NewGame(game_mode) => {
+                        return self.start_new_game(game_mode);
+                    }
+                    WelcomeWindowKeyResult::ExitGame => {
+                        return self.quit();
+                    }
+                }
+            }
+        }
+
+        if let Some(game_window) = self.game_window.as_mut() {
+            if let Some(key_result) = game_window.on_key_pressed(key) {
+                match key_result {
+                    GameWindowKeyResult::StopTheGame => {
+                        return self.stop_the_game();
+                    }
+                }
+            }
         }
     }
 
