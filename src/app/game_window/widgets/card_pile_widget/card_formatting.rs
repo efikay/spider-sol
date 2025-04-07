@@ -45,15 +45,37 @@ pub fn make_card_pile_ascii_cards<'a>(
 
     for (card_index, card) in pile.cards().iter().enumerate() {
         let is_last = card_index == cards_len - 1;
-        let is_highlighted = (highlight_last_card && is_last)
-            || match idx_card_highlight_start {
-                Some(highlight_start_idx) => card_index >= highlight_start_idx,
-                None => false,
-            };
+
+        let border_styling = match idx_card_highlight_start {
+            Some(highlight_start_idx) => match card_index >= highlight_start_idx {
+                true => BorderStyling::Highlight,
+                false => match card.is_opened {
+                    true => BorderStyling::Dim,
+                    false => BorderStyling::Default,
+                },
+            },
+            None => match highlight_last_card && is_last {
+                true => BorderStyling::Highlight,
+                false => match cursor.mode() {
+                    Some(GameCursorMode::CardSelect(_)) => {
+                        assert!(highlight_last_card == false);
+                        BorderStyling::Default
+                    }
+                    Some(GameCursorMode::PileSelect(_)) => match cursor.pile_index() {
+                        Some(index) if index == this_pile_index => BorderStyling::Dim,
+                        _ => BorderStyling::Default,
+                    },
+                    None => {
+                        assert!(false);
+                        BorderStyling::Default
+                    }
+                },
+            },
+        };
 
         ascii_cards.push(make_ascii_card(MakeAsciiCardParams {
             card,
-            is_highlighted,
+            border_styling,
             is_last,
         }));
     }
@@ -61,19 +83,25 @@ pub fn make_card_pile_ascii_cards<'a>(
     ascii_cards
 }
 
+enum BorderStyling {
+    Default,
+    Highlight,
+    Dim,
+}
+
 struct MakeAsciiCardParams<'a> {
     pub card: &'a Card,
-    pub is_highlighted: bool,
+    pub border_styling: BorderStyling,
     pub is_last: bool,
 }
 fn make_ascii_card(params: MakeAsciiCardParams) -> Text {
     let MakeAsciiCardParams {
         card,
-        is_highlighted,
+        border_styling,
         is_last,
     } = params;
 
-    let border_style = get_border_style_by_highlight(is_highlighted);
+    let border_style = calc_border_style(border_styling);
 
     if card.is_opened {
         make_ascii_opened_card(MakeAsciiOpenedCardParams {
@@ -178,18 +206,17 @@ fn make_ascii_closed_card(params: &MakeAsciiClosedCardParams) -> Text<'static> {
             card_back_line,
             bottom_line,
         ])
-        .style(border_style)
     } else {
-        Text::from(vec![top_line, card_back_line]).style(border_style)
+        Text::from(vec![top_line, card_back_line])
     }
 }
 
 /// ---------- Styling & colors ---------- ///
-fn get_border_style_by_highlight(is_highlighted: bool) -> Style {
-    if is_highlighted {
-        Style::new().add_modifier(Modifier::BOLD)
-    } else {
-        Style::new()
+fn calc_border_style(border_styling: BorderStyling) -> Style {
+    match border_styling {
+        BorderStyling::Default => Style::new(),
+        BorderStyling::Highlight => Style::new().fg(Color::LightYellow),
+        BorderStyling::Dim => Style::new().add_modifier(Modifier::DIM),
     }
 }
 fn get_suit_color(suit: Suit) -> Color {
