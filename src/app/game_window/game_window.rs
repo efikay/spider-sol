@@ -162,11 +162,11 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
                 self.on_right_pressed()
             }
             // [Deal cards]
-            (_, KeyCode::Char(' ')) => self.on_d_pressed(),
+            (_, KeyCode::Tab) => self.on_tab_pressed(),
             // [Restart the game]
             (_, KeyCode::Char('r')) => return Some(GameWindowKeyResult::RestartTheGame),
             // [Select a card / Select a pile]
-            (_, KeyCode::Enter | KeyCode::Tab) => self.on_action_pressed(),
+            (_, KeyCode::Enter | KeyCode::Char(' ')) => self.on_action_pressed(),
             _ => {
                 // None
             }
@@ -189,7 +189,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
                 .set_for_card_selection(self.calc_playable_card_lengths());
         }
     }
-    fn on_d_pressed(&mut self) {
+    fn on_tab_pressed(&mut self) {
         if !self.is_placing_a_card() && self.deals_left() > 0 {
             self.deal_cards();
         }
@@ -219,8 +219,8 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             );
         }
 
-        let areas = Layout::vertical([Constraint::Min(4), Constraint::Percentage(100)])
-            .split(frame.area());
+        let areas =
+            Layout::vertical([Constraint::Min(4), Constraint::Percentage(100)]).split(frame.area());
 
         {
             let text_area = areas[0];
@@ -256,26 +256,34 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
     }
 
     fn make_info_text(&self) -> Text {
-        let deals_left_text = format!("Deals left: {}", self.deals_left());
+        let move_hint = if self.is_placing_a_card() {
+            "<Space|Enter> – Place card"
+        } else if self.is_selecting_a_card() {
+            "<Space|Enter> – Take card"
+        } else {
+            "(ノ ゜Д゜)ノ ︵ ┻━┻"
+        };
         let deal_hint = if self.can_deal_cards() {
-            "<tab|enter> – deal"
+            "<Tab> – Take deal"
         } else {
             ".."
         };
         let restart_hint = "<r> – restart";
         let exit_hint = "<q> – menu";
-        let sequences_text = format!(
+        let navigation_hint = "wasd, hjkl, ←↑↓→ - navigation";
+
+        let deals_info = format!("Deals left: {}", self.deals_left());
+        let sequences_info = format!(
             "Complete sequences: - {}/8",
             self.game_engine.complete_sequences_count()
         );
-        let navigation_hint = "wasd, hjkl, ←↑↓→ - navigation";
 
         Text::from(vec![
             Line::from(format!(
-                "{} | {} | {} | {}",
-                exit_hint, restart_hint, deal_hint, navigation_hint
+                "{} | {} | {} | {} | {}",
+                exit_hint, restart_hint, move_hint, deal_hint, navigation_hint
             )),
-            Line::from(format!("{} | {}", deals_left_text, sequences_text)),
+            Line::from(format!("{} | {}", deals_info, sequences_info)),
         ])
     }
 }

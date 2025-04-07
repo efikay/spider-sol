@@ -95,7 +95,7 @@ impl WelcomeWindow {
                 None
             }
             // [Select game mode / Select exit]
-            (_, KeyCode::Enter) => Some(self.on_enter_pressed()),
+            (_, KeyCode::Enter | KeyCode::Char(' ')) => Some(self.on_option_select_pressed()),
             _ => None,
         }
     }
@@ -105,7 +105,7 @@ impl WelcomeWindow {
     fn on_up_pressed(&mut self) {
         self.cursor_position = self.cursor_position.prev()
     }
-    fn on_enter_pressed(&self) -> WelcomeWindowKeyResult {
+    fn on_option_select_pressed(&self) -> WelcomeWindowKeyResult {
         match self.cursor_position {
             WelcomeWindowCursorPosition::NewGame(game_mode) => {
                 WelcomeWindowKeyResult::NewGame(game_mode)
