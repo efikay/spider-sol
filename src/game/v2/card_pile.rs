@@ -44,9 +44,6 @@ impl CardPileV2 {
     pub fn card_strings(&self) -> Vec<String> {
         self.cards.iter().map(|c| c.to_string()).collect()
     }
-    pub fn ascii_card_strings(&self) -> Vec<String> {
-        Card::cards_to_ascii(self.cards.clone())
-    }
 
     pub fn add_start_card(&mut self, card: Card) {
         self.cards.push(card);

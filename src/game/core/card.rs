@@ -62,58 +62,6 @@ impl Card {
     pub fn make_complete_sequence_of_opened(suit: Suit) -> Vec<Card> {
         Rank::iter().map(|r| Card::new_opened(r, suit)).collect()
     }
-
-    pub fn cards_to_ascii(cards: Vec<Card>) -> Vec<String> {
-        fn last_card_to_ascii(card: Card) -> String {
-            if !card.is_opened {
-                String::from(
-                    "┌─────┐\n\
-                     │░░░░░│\n\
-                     │░░░░░│\n\
-                     │░░░░░│\n\
-                     └─────┘",
-                )
-            } else {
-                format!(
-                    "┌─────┐\n\
-                     │{:<5}│\n\
-                     │  {}  │\n\
-                     │{:>5}│\n\
-                     └─────┘",
-                    card.rank.to_human(),
-                    card.suit.symbol(),
-                    card.rank.to_human()
-                )
-            }
-        }
-
-        fn non_last_card_to_ascii(card: Card) -> String {
-            if !card.is_opened {
-                String::from(
-                    "┌─────┐\n\
-                     │░░░░░│",
-                )
-            } else {
-                format!(
-                    "┌─────┐\n\
-                     │{:<3}{} │",
-                    card.rank.to_human(),
-                    card.suit.symbol(),
-                )
-            }
-        }
-
-        let mut asciis = vec![];
-
-        if let [cards @ .., last_card] = cards.as_slice() {
-            for item in cards {
-                asciis.push(non_last_card_to_ascii(*item));
-            }
-            asciis.push(last_card_to_ascii(*last_card));
-        }
-
-        asciis
-    }
 }
 
 // ------ Formatting ------ ///
