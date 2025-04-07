@@ -78,9 +78,7 @@ impl App {
                     }
                 }
             }
-        }
-
-        if let Some(game_window) = self.game_window.as_mut() {
+        } else if let Some(game_window) = self.game_window.as_mut() {
             if let Some(key_result) = game_window.on_key_pressed(key) {
                 match key_result {
                     GameWindowKeyResult::StopTheGame => {
