@@ -327,7 +327,17 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             line.push_span(Span::from("| Complete sequences: "));
             line.extend(complete_sequence_icons);
 
-            line.push_span(Span::from("| <p> – Peek"));
+            if let Some(card_peeks) = self.card_peeks {
+                let has_nothing_to_peek = card_peeks.iter().all(|p| p.is_none());
+
+                if has_nothing_to_peek {
+                    line.push_span(Span::from("| Nothing to peek ¯\\_(ツ)_/¯"));
+                } else {
+                    line.push_span(Span::from("| (◔_◔)"));
+                }
+            } else {
+                line.push_span(Span::from("| <p> – Peek"));
+            }
 
             line
         };
