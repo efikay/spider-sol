@@ -4,7 +4,10 @@ use ratatui::{
     widgets::{List, StatefulWidget, Widget},
 };
 
-use crate::{app::game_window::game_cursor::GameCursor, game::v2::CardPileV2};
+use crate::{
+    app::game_window::game_cursor::GameCursor,
+    game::v2::{CardPeek, CardPileV2},
+};
 
 use super::{
     card_formatting::make_card_pile_ascii_cards,
@@ -16,11 +19,12 @@ use super::{
 #[derive(Clone, Copy)]
 pub struct CardPileWidget {
     cursor: GameCursor,
+    card_peek: Option<CardPeek>,
 }
 
 impl CardPileWidget {
-    pub fn new(cursor: GameCursor) -> Self {
-        Self { cursor }
+    pub fn new(cursor: GameCursor, card_peek: Option<CardPeek>) -> Self {
+        Self { cursor, card_peek }
     }
 }
 
@@ -44,7 +48,7 @@ impl StatefulWidget for CardPileWidget {
                     None
                 },
             });
-        let ascii_card_lines = make_card_pile_ascii_cards(&self.cursor, state);
+        let ascii_card_lines = make_card_pile_ascii_cards(&self.cursor, state, self.card_peek);
 
         let ascii_lines = ascii_card_lines
             .into_iter()

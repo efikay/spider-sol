@@ -2,7 +2,10 @@
 
 use std::fmt;
 
-use super::card_move::{CardMove, CardMoveBuilder};
+use super::{
+    card_move::{CardMove, CardMoveBuilder},
+    card_peek::CardPeek,
+};
 use crate::game::core::{COMPLETE_SEQUENCE_LENGTH, Card, PILES_AMOUNT};
 
 const NO_CARDS: [Card; 0] = [];
@@ -56,7 +59,36 @@ impl CardPileV2 {
         self.cards.push(card);
     }
 
-    pub fn open_last_card(&mut self) {
+    /**
+     * Assuming moves are this-pile from only.
+     *
+     * Return last closed card (if several conditions are met).
+     *
+     * Basically it's just "Undo" functionality abuse replacement
+     */
+    pub fn calc_card_peek(&self, pile_moves: &Vec<CardMove>) -> Option<CardPeek> {
+        assert!(pile_moves.iter().all(|pile| pile.src_pile() == self.index));
+
+        let has_peekable_move = pile_moves.iter().any(|card_move| card_move.src_card() == 0);
+
+        if !has_peekable_move {
+            return None;
+        }
+
+        let non_playable_cards = self.non_playable_cards();
+
+        if let Some((card_index, card)) = non_playable_cards.iter().enumerate().last() {
+            if !card.is_opened {
+                Some(CardPeek::with_card_at_index(*card, card_index))
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
+    fn open_last_card(&mut self) {
         if let Some(last_card) = self.cards.last_mut() {
             last_card.is_opened = true;
         }
@@ -127,50 +159,35 @@ impl CardPileV2 {
         self.playable_cards().len()
     }
 
-    pub fn calc_moves_to(&self, other: &CardPileV2) -> Vec<CardMove> {
+    pub fn calc_moves_to(&self, other_pile: &CardPileV2) -> Vec<CardMove> {
         let cards = self.playable_cards();
-        let other_cards = other.playable_cards();
 
-        if !self.can_move_to(other) {
+        if cards.is_empty() {
             return vec![];
-        }
-
-        if other_cards.is_empty() {
+        } else if let Some(last_other_pile_card) = other_pile.playable_cards().last() {
+            cards
+                .iter()
+                .enumerate()
+                .filter(|(_, card)| card.can_move_on(last_other_pile_card))
+                .map(|(card_index, _)| {
+                    CardMoveBuilder::from_pile(self.index)
+                        .using_card(card_index)
+                        .to_card_pile(other_pile.index)
+                        .build()
+                })
+                .collect()
+        } else {
             cards
                 .iter()
                 .enumerate()
                 .map(|(index, _)| {
                     CardMoveBuilder::from_pile(self.index)
                         .using_card(index)
-                        .to_empty_pile(other.index)
+                        .to_empty_pile(other_pile.index)
                         .build()
                 })
                 .collect()
-        } else {
-            vec![
-                CardMoveBuilder::from_pile(self.index)
-                    .to_card_pile(other.index)
-                    .build(),
-            ]
         }
-    }
-
-    fn can_move_to(&self, other: &CardPileV2) -> bool {
-        let cards = self.playable_cards();
-        let other_cards = other.playable_cards();
-
-        if cards.is_empty() {
-            return false;
-        }
-        if other_cards.is_empty() {
-            return true;
-        }
-
-        cards.iter().any(|card| {
-            other_cards
-                .iter()
-                .any(|other_card| card.can_move_on(other_card))
-        })
     }
 
     fn extract_playable_cards_from(&mut self, index: usize) -> Vec<Card> {

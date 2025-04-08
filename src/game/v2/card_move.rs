@@ -7,24 +7,30 @@ type SrcCardIndex = usize;
 type SrcPileIndex = usize;
 type DestPileIndex = usize;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CardMoveType {
-    OnEmptyPile(SrcCardIndex),
+    OnEmptyPile = 1,
     OnCardPile,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CardMove {
     move_type: CardMoveType,
+
     src: SrcPileIndex,
+    src_card_index: SrcCardIndex,
     dest: SrcPileIndex,
 }
 
 impl CardMove {
-    pub fn new_card_move(src: SrcPileIndex, dest: SrcPileIndex) -> Self {
+    pub fn new_card_move(
+        (src, src_card_index): (SrcPileIndex, SrcCardIndex),
+        dest: SrcPileIndex,
+    ) -> Self {
         Self {
             src,
             dest,
+            src_card_index,
             move_type: CardMoveType::OnCardPile,
         }
     }
@@ -35,7 +41,8 @@ impl CardMove {
         Self {
             src,
             dest,
-            move_type: CardMoveType::OnEmptyPile(src_card_index),
+            src_card_index,
+            move_type: CardMoveType::OnEmptyPile,
         }
     }
 
@@ -45,11 +52,8 @@ impl CardMove {
     pub fn dest_pile(&self) -> DestPileIndex {
         self.dest
     }
-    pub fn src_card(&self) -> Option<SrcCardIndex> {
-        match self.move_type {
-            CardMoveType::OnEmptyPile(card_index) => Some(card_index),
-            CardMoveType::OnCardPile => None,
-        }
+    pub fn src_card(&self) -> SrcCardIndex {
+        self.src_card_index
     }
     pub fn move_type(&self) -> CardMoveType {
         self.move_type
@@ -62,18 +66,23 @@ impl CardMove {
 /// -------- Formatting -------- ///
 impl fmt::Display for CardMove {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self.move_type {
-            CardMoveType::OnEmptyPile(card_index) => {
-                write!(
-                    f,
-                    "EmptyPileMove {{ {}->{}, card_idx={} }}",
-                    self.src, self.dest, card_index
-                )
+        write!(
+            f,
+            "{} {{ {}->{}, card_idx={} }}",
+            self.move_type, self.src, self.dest, self.src_card_index
+        )
+    }
+}
+impl fmt::Display for CardMoveType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                CardMoveType::OnEmptyPile => "OnEmptyPile",
+                CardMoveType::OnCardPile => "OnCardPile",
             }
-            CardMoveType::OnCardPile => {
-                write!(f, "CardPileMove {{ {}->{} }}", self.src, self.dest)
-            }
-        }
+        )
     }
 }
 
@@ -88,12 +97,7 @@ impl Ord for CardMove {
     fn cmp(&self, other: &Self) -> Ordering {
         match self.src.cmp(&other.src) {
             Ordering::Equal => match self.dest.cmp(&other.dest) {
-                Ordering::Equal => match (self.move_type, other.move_type) {
-                    (CardMoveType::OnEmptyPile(a), CardMoveType::OnEmptyPile(b)) => a.cmp(&b),
-                    (CardMoveType::OnCardPile, CardMoveType::OnCardPile) => Ordering::Equal,
-                    (CardMoveType::OnEmptyPile(_), CardMoveType::OnCardPile) => Ordering::Less,
-                    (CardMoveType::OnCardPile, CardMoveType::OnEmptyPile(_)) => Ordering::Greater,
-                },
+                Ordering::Equal => self.move_type.cmp(&other.move_type),
                 ordering => ordering,
             },
             ordering => ordering,
@@ -133,12 +137,7 @@ impl CardMoveBuilder {
 
     pub fn to_empty_pile(mut self, dest_pile_index: DestPileIndex) -> Self {
         self.dest_pile_index = Some(dest_pile_index);
-        match self.src_card_index {
-            Some(src_card) => {
-                self.move_type = Some(CardMoveType::OnEmptyPile(src_card));
-            }
-            None => panic!("Please specify card before creating empty pile move!"),
-        }
+        self.move_type = Some(CardMoveType::OnEmptyPile);
 
         self
     }
@@ -147,18 +146,22 @@ impl CardMoveBuilder {
         if self.move_type.is_none() {
             panic!("No move type specified");
         }
+        if self.src_card_index.is_none() {
+            panic!("No src card specified");
+        }
         if self.dest_pile_index.is_none() {
             panic!("No dest pile specified");
         }
 
         match self.move_type.unwrap() {
-            CardMoveType::OnEmptyPile(card_index) => CardMove::new_pile_move(
-                (self.src_pile_index.unwrap(), card_index),
+            CardMoveType::OnEmptyPile => CardMove::new_pile_move(
+                (self.src_pile_index.unwrap(), self.src_card_index.unwrap()),
                 self.dest_pile_index.unwrap(),
             ),
-            CardMoveType::OnCardPile => {
-                CardMove::new_card_move(self.src_pile_index.unwrap(), self.dest_pile_index.unwrap())
-            }
+            CardMoveType::OnCardPile => CardMove::new_card_move(
+                (self.src_pile_index.unwrap(), self.src_card_index.unwrap()),
+                self.dest_pile_index.unwrap(),
+            ),
         }
     }
 }

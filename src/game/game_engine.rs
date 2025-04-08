@@ -5,8 +5,8 @@ use std::{cell::RefCell, rc::Rc};
 
 use super::{
     card_stock::ICardStock,
-    core::{COMPLETE_SEQUENCE_LENGTH, COMPLETE_SEQUENCES_TO_WIN, Card},
-    v2::CardMove,
+    core::{COMPLETE_SEQUENCE_LENGTH, COMPLETE_SEQUENCES_TO_WIN, Card, PILES_AMOUNT},
+    v2::{CardMove, CardPeek},
 };
 use crate::game::game_tableau::GameTableau;
 
@@ -40,6 +40,10 @@ impl<CardStockT: ICardStock> GameEngine<CardStockT> {
         } else {
             panic!("No deals left :(");
         }
+    }
+
+    pub fn get_card_peeks(&self) -> [Option<CardPeek>; PILES_AMOUNT] {
+        self.tableau.borrow().card_peeks()
     }
 
     pub fn get_available_moves(&self) -> Vec<CardMove> {

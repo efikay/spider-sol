@@ -25,7 +25,7 @@ Status: In development 🚧 🏁 (Basic TUI and game engine is rdy)
   - (✅) https://github.com/ratatui/ratatui
   - https://github.com/gyscos/cursive
 3. (✅) Basic TUI
-4. Undo functionality + keybind
+4. ~~Undo functionality + keybind~~ (✅) Card peek option (Kinda undo replacement, Undo will come later maybe)
 5. Hint functionality + keybind
 6. Advanced TUI:
   - Splash screen
