@@ -144,7 +144,10 @@ mod tests {
         ]);
 
         let mut expected_moves = vec![
-            CardMoveBuilder::from_pile(0).to_card_pile(1).build(),
+            CardMoveBuilder::from_pile(0)
+                .using_card(0)
+                .to_card_pile(1)
+                .build(),
             CardMoveBuilder::from_pile(0)
                 .using_card(0)
                 .to_empty_pile(3)
@@ -173,7 +176,12 @@ mod tests {
             Card::new_opened(Rank::Three, Suit::Hearts),
         ]);
 
-        let expected_card_moves = vec![CardMoveBuilder::from_pile(0).to_card_pile(1).build()];
+        let expected_card_moves = vec![
+            CardMoveBuilder::from_pile(0)
+                .using_card(0)
+                .to_card_pile(1)
+                .build(),
+        ];
 
         let result_card_moves: Vec<CardMove> = tableau
             .calculate_available_moves()
@@ -210,8 +218,10 @@ mod tests {
         ]);
 
         let expected_card_moves = vec![
-            CardMoveBuilder::from_pile(0).to_card_pile(1).build(),
-            CardMoveBuilder::from_pile(1).to_card_pile(0).build(),
+            CardMoveBuilder::from_pile(0)
+                .using_card(2)
+                .to_card_pile(1)
+                .build(),
         ];
         let result_card_moves: Vec<CardMove> = tableau
             .calculate_available_moves()
