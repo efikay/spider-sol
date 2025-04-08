@@ -295,7 +295,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         let deal_hint = if self.can_deal_cards() {
             "<Tab> – Take deal"
         } else {
-            ".."
+            "ᕙ(⇀‸↼‶)ᕗ"
         };
         let restart_hint = "<r> – restart";
         let exit_hint = "<q> – menu";
