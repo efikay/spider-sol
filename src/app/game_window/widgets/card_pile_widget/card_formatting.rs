@@ -46,14 +46,14 @@ pub fn make_card_pile_ascii_cards<'a>(
 
     for (card_index, card) in pile.cards().iter().enumerate() {
         let is_last = card_index == cards_len - 1;
-        let is_picked = if let Some(card_peek) = card_peek {
+        let is_peeked = if let Some(card_peek) = card_peek {
             card_peek.index == card_index
         } else {
             false
         };
 
-        let border_styling = if is_picked {
-            BorderStyling::Picked
+        let border_styling = if is_peeked {
+            BorderStyling::Peeked
         } else {
             match idx_card_highlight_start {
                 Some(highlight_start_idx) => match card_index >= highlight_start_idx {
@@ -87,6 +87,7 @@ pub fn make_card_pile_ascii_cards<'a>(
             card,
             border_styling,
             is_last,
+            is_peeked,
         }));
     }
 
@@ -97,24 +98,26 @@ enum BorderStyling {
     Default,
     Highlight,
     Dim,
-    Picked,
+    Peeked,
 }
 
 struct MakeAsciiCardParams<'a> {
     pub card: &'a Card,
     pub border_styling: BorderStyling,
     pub is_last: bool,
+    pub is_peeked: bool,
 }
 fn make_ascii_card(params: MakeAsciiCardParams) -> Text {
     let MakeAsciiCardParams {
         card,
         border_styling,
         is_last,
+        is_peeked,
     } = params;
 
     let border_style = calc_border_style(border_styling);
 
-    if card.is_opened {
+    if card.is_opened || is_peeked {
         make_ascii_opened_card(MakeAsciiOpenedCardParams {
             border_style,
             is_last,
@@ -228,7 +231,7 @@ fn calc_border_style(border_styling: BorderStyling) -> Style {
         BorderStyling::Default => Style::new(),
         BorderStyling::Highlight => Style::new().fg(Color::LightMagenta),
         BorderStyling::Dim => Style::new().add_modifier(Modifier::DIM),
-        BorderStyling::Picked => Style::new()
+        BorderStyling::Peeked => Style::new()
             .add_modifier(Modifier::DIM)
             .fg(Color::LightYellow),
     }

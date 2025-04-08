@@ -327,6 +327,8 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             line.push_span(Span::from("| Complete sequences: "));
             line.extend(complete_sequence_icons);
 
+            line.push_span(Span::from("| <p> – Peek"));
+
             line
         };
 
