@@ -165,8 +165,8 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
                 return Some(GameWindowKeyResult::StopTheGame);
             }
             // [Peek cards]
-            (_, KeyCode::Char('p')) => {
-                self.on_p_pressed();
+            (_, KeyCode::Char('p') | KeyCode::Char('`')) => {
+                self.on_peek_pressed();
 
                 return None;
             }
@@ -200,7 +200,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
                 .set_for_card_selection(self.calc_playable_card_lengths());
         }
     }
-    fn on_p_pressed(&mut self) {
+    fn on_peek_pressed(&mut self) {
         self.card_peeks = Some(self.game_engine.get_card_peeks());
     }
     fn on_action_pressed(&mut self) {
@@ -336,7 +336,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
                     line.push_span(Span::from("| (◔_◔)"));
                 }
             } else {
-                line.push_span(Span::from("| <p> – Peek"));
+                line.push_span(Span::from("| <`|p> – Peek"));
             }
 
             line
