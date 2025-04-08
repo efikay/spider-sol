@@ -26,7 +26,7 @@ Status: In development 🚧 🏁 (Basic TUI and game engine is rdy)
   - https://github.com/gyscos/cursive
 3. (✅) Basic TUI
 4. ~~Undo functionality + keybind~~ (✅) Card peek option (Kinda undo replacement, Undo will come later maybe)
-5. Hint functionality + keybind
+5. ~~Hint functionality + keybind~~ (✅) Card peek is hint++ by the way
 6. Advanced TUI:
   - Splash screen
   - Loading screens
