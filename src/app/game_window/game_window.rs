@@ -13,7 +13,7 @@ use crate::game::{
     card_stock::ICardStock,
     core::{COMPLETE_SEQUENCES_TO_WIN, PILES_AMOUNT},
     game_engine::GameEngine,
-    v2::CardMoveBuilder,
+    v2::{CardMoveBuilder, CardPeek},
 };
 
 use super::{
@@ -31,6 +31,7 @@ pub struct GameWindow<CardStockT: ICardStock> {
     game_engine: GameEngine<CardStockT>,
 
     cursor: GameCursor,
+    card_peeks: Option<[Option<CardPeek>; PILES_AMOUNT]>,
 }
 
 impl<CardStockT: ICardStock> GameWindow<CardStockT> {
@@ -43,6 +44,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         Self {
             game_engine,
             cursor,
+            card_peeks: None,
         }
     }
 
@@ -113,6 +115,7 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             } else {
                 self.game_engine.perform_move(
                     CardMoveBuilder::from_pile(selected_card_pile_idx)
+                        .using_card(selected_card_idx)
                         .to_card_pile(target_pile_idx)
                         .build(),
                 )
@@ -120,6 +123,10 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
         } else {
             Err(())
         }
+    }
+
+    fn clear_card_peeks(&mut self) {
+        self.card_peeks = None;
     }
 
     fn calc_playable_card_lengths(&self) -> [usize; PILES_AMOUNT] {
@@ -157,6 +164,12 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             | (KeyModifiers::CONTROL, KeyCode::Char('c') | KeyCode::Char('C')) => {
                 return Some(GameWindowKeyResult::StopTheGame);
             }
+            // [Peek cards]
+            (_, KeyCode::Char('p')) => {
+                self.on_p_pressed();
+
+                return None;
+            }
             // [Arrow navigation]
             (_, KeyCode::Left | KeyCode::Char('h') | KeyCode::Char('a')) => self.on_left_pressed(),
             (_, KeyCode::Down | KeyCode::Char('j') | KeyCode::Char('s')) => self.on_down_pressed(),
@@ -177,6 +190,8 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             }
         };
 
+        self.clear_card_peeks();
+
         None
     }
     fn on_esc_pressed(&mut self) {
@@ -184,6 +199,9 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             self.cursor
                 .set_for_card_selection(self.calc_playable_card_lengths());
         }
+    }
+    fn on_p_pressed(&mut self) {
+        self.card_peeks = Some(self.game_engine.get_card_peeks());
     }
     fn on_action_pressed(&mut self) {
         if self.is_selecting_a_card() {
@@ -259,10 +277,10 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             });
 
             frame.render_stateful_widget(
-                TableauWidget::new(self.cursor),
+                TableauWidget::new(self.cursor, self.card_peeks),
                 tableau_area,
                 &mut self.game_engine.tableau(),
-            )
+            );
         }
     }
 

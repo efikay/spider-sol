@@ -9,13 +9,14 @@ use crate::{
     app::game_window::game_cursor::{GameCursor, GameCursorMode},
     game::{
         core::{Card, Suit},
-        v2::CardPileV2,
+        v2::{CardPeek, CardPileV2},
     },
 };
 
 pub fn make_card_pile_ascii_cards<'a>(
     cursor: &'a GameCursor,
     pile: &'a mut CardPileV2,
+    card_peek: Option<CardPeek>,
 ) -> Vec<Text<'a>> {
     let mut ascii_cards = vec![];
 
@@ -45,32 +46,41 @@ pub fn make_card_pile_ascii_cards<'a>(
 
     for (card_index, card) in pile.cards().iter().enumerate() {
         let is_last = card_index == cards_len - 1;
+        let is_picked = if let Some(card_peek) = card_peek {
+            card_peek.index == card_index
+        } else {
+            false
+        };
 
-        let border_styling = match idx_card_highlight_start {
-            Some(highlight_start_idx) => match card_index >= highlight_start_idx {
-                true => BorderStyling::Highlight,
-                false => match card.is_opened {
-                    true => BorderStyling::Dim,
-                    false => BorderStyling::Default,
-                },
-            },
-            None => match highlight_last_card && is_last {
-                true => BorderStyling::Highlight,
-                false => match cursor.mode() {
-                    Some(GameCursorMode::CardSelect(_)) => {
-                        assert!(highlight_last_card == false);
-                        BorderStyling::Default
-                    }
-                    Some(GameCursorMode::PileSelect(_)) => match cursor.pile_index() {
-                        Some(index) if index == this_pile_index => BorderStyling::Dim,
-                        _ => BorderStyling::Default,
+        let border_styling = if is_picked {
+            BorderStyling::Picked
+        } else {
+            match idx_card_highlight_start {
+                Some(highlight_start_idx) => match card_index >= highlight_start_idx {
+                    true => BorderStyling::Highlight,
+                    false => match card.is_opened {
+                        true => BorderStyling::Dim,
+                        false => BorderStyling::Default,
                     },
-                    None => {
-                        assert!(false);
-                        BorderStyling::Default
-                    }
                 },
-            },
+                None => match highlight_last_card && is_last {
+                    true => BorderStyling::Highlight,
+                    false => match cursor.mode() {
+                        Some(GameCursorMode::CardSelect(_)) => {
+                            assert!(highlight_last_card == false);
+                            BorderStyling::Default
+                        }
+                        Some(GameCursorMode::PileSelect(_)) => match cursor.pile_index() {
+                            Some(index) if index == this_pile_index => BorderStyling::Dim,
+                            _ => BorderStyling::Default,
+                        },
+                        None => {
+                            assert!(false);
+                            BorderStyling::Default
+                        }
+                    },
+                },
+            }
         };
 
         ascii_cards.push(make_ascii_card(MakeAsciiCardParams {
@@ -87,6 +97,7 @@ enum BorderStyling {
     Default,
     Highlight,
     Dim,
+    Picked,
 }
 
 struct MakeAsciiCardParams<'a> {
@@ -217,6 +228,9 @@ fn calc_border_style(border_styling: BorderStyling) -> Style {
         BorderStyling::Default => Style::new(),
         BorderStyling::Highlight => Style::new().fg(Color::LightMagenta),
         BorderStyling::Dim => Style::new().add_modifier(Modifier::DIM),
+        BorderStyling::Picked => Style::new()
+            .add_modifier(Modifier::DIM)
+            .fg(Color::LightYellow),
     }
 }
 fn get_suit_color(suit: Suit) -> Color {

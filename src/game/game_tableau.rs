@@ -5,7 +5,7 @@ use std::{cell::RefCell, rc::Rc};
 
 use super::{
     core::{COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT},
-    v2::{CardMove, CardMoveType, CardPileV2},
+    v2::{CardMove, CardMoveType, CardPeek, CardPileV2},
 };
 use crate::game::core::Card;
 
@@ -42,6 +42,22 @@ impl GameTableau {
             .for_each(|(pile, card)| {
                 pile.add_deal_card(*card);
             });
+    }
+
+    pub fn card_peeks(&self) -> [Option<CardPeek>; PILES_AMOUNT] {
+        let piles = self.piles.borrow();
+        let available_moves = self.calculate_available_moves();
+
+        std::array::from_fn(|pile_index| {
+            let pile = &piles[pile_index];
+            let pile_moves = available_moves
+                .iter()
+                .cloned()
+                .filter(|card_move| card_move.src_pile() == pile.index())
+                .collect::<Vec<_>>();
+
+            pile.calc_card_peek(&pile_moves)
+        })
     }
 
     pub fn extract_complete_sequences(&mut self) -> Vec<[Card; COMPLETE_SEQUENCE_LENGTH]> {
@@ -89,8 +105,8 @@ impl GameTableau {
             unsafe { &mut *(&mut self.piles.borrow_mut()[card_move.dest_pile()] as *mut _) };
 
         match card_move.move_type() {
-            CardMoveType::OnEmptyPile(src_card) => {
-                src_pile.perform_empty_pile_move(dest_pile, src_card)
+            CardMoveType::OnEmptyPile => {
+                src_pile.perform_empty_pile_move(dest_pile, card_move.src_card())
             }
             CardMoveType::OnCardPile => src_pile.perform_card_pile_move(dest_pile),
         }
