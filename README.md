@@ -48,8 +48,8 @@ Status: ✅ Mostly playable 🚧 (Still requires some refinement and features)
 - [ ] Sticky-select available pile to move selected card in
 - [ ] Ability to auto-move cards to another column (as option)
 - [ ] Undos,Redos(maybe), Hint button
-- [ ] Timer, Stockpile usages left, stats, etc
-- [ ] Restart,New game,100% winnable shuffle option
+- [ ] Timer, (✅)Stockpile usages left, stats, etc
+- [ ] (✅)Restart,(✅)New game,100% winnable shuffle option
 
 ## Tags
 
