@@ -35,7 +35,7 @@ Status: ✅ Mostly playable 🚧 (Still requires some refinement and features)
 7. Add more features (QoL/auto-features)
 8. CLI params
 9. (maybe) Other variants of solitaire?
-10. (always welcome) Realize some ideas that are nice
+10. (always welcome) Implement some ideas that are nice
 
 ## Ideas
 - [ ] Card auto size (responsive layout) / Cards zipping (To make sure game ok at least terminal size as possible) + Check area size and calculate what's appropriate
