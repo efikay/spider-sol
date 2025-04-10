@@ -8,7 +8,7 @@
 5. [License](#license)
 
 ## Status
-Status: In development 🚧 🏁 (Basic TUI and game engine is rdy)
+Status: ✅ Mostly playable 🚧 (Still requires some refinement and features)
 
 ![Alt Text](./game.gif)
 
