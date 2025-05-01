@@ -6,7 +6,7 @@ use super::{
     card_move::{CardMove, CardMoveBuilder},
     card_peek::CardPeek,
 };
-use crate::game::core::{COMPLETE_SEQUENCE_LENGTH, Card, PILES_AMOUNT};
+use crate::game::core::{Card, Suit, COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT};
 
 const NO_CARDS: [Card; 0] = [];
 
@@ -57,6 +57,12 @@ impl CardPileV2 {
         }
 
         self.cards.push(card);
+    }
+    pub fn tip_suit(&self) -> Option<Suit> {
+        match self.playable_cards().last() {
+            Some(card) => Some(card.suit),
+            None => None,
+        }
     }
 
     /**

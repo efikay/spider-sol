@@ -5,7 +5,7 @@ use std::{cell::RefCell, rc::Rc};
 
 use super::{
     card_stock::ICardStock,
-    core::{COMPLETE_SEQUENCE_LENGTH, COMPLETE_SEQUENCES_TO_WIN, Card, PILES_AMOUNT},
+    core::{Card, Suit, COMPLETE_SEQUENCES_TO_WIN, COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT},
     v2::{CardMove, CardPeek},
 };
 use crate::game::game_tableau::GameTableau;
@@ -48,6 +48,10 @@ impl<CardStockT: ICardStock> GameEngine<CardStockT> {
 
     pub fn get_available_moves(&self) -> Vec<CardMove> {
         self.tableau.borrow().calculate_available_moves()
+    }
+
+    pub fn get_pile_suit(&self, pile_idx: usize) -> Option<Suit> {
+        self.tableau().borrow().pile_suit(pile_idx)
     }
 
     pub fn perform_move(&mut self, card_move: CardMove) -> Result<(), ()> {

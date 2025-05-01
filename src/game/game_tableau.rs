@@ -4,7 +4,7 @@ use core::fmt;
 use std::{cell::RefCell, rc::Rc};
 
 use super::{
-    core::{COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT},
+    core::{COMPLETE_SEQUENCE_LENGTH, PILES_AMOUNT, Suit},
     v2::{CardMove, CardMoveType, CardPeek, CardPileV2},
 };
 use crate::game::core::Card;
@@ -58,6 +58,14 @@ impl GameTableau {
 
             pile.calc_card_peek(&pile_moves)
         })
+    }
+
+    pub fn pile_suit(&self, pile_idx: usize) -> Option<Suit> {
+        if pile_idx + 1 > PILES_AMOUNT {
+            panic!("Pile index is out of bounds!")
+        }
+
+        self.piles().borrow()[pile_idx].tip_suit()
     }
 
     pub fn extract_complete_sequences(&mut self) -> Vec<[Card; COMPLETE_SEQUENCE_LENGTH]> {

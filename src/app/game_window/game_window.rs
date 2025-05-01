@@ -13,7 +13,7 @@ use crate::game::{
     card_stock::ICardStock,
     core::{COMPLETE_SEQUENCES_TO_WIN, PILES_AMOUNT},
     game_engine::GameEngine,
-    v2::{CardMoveBuilder, CardPeek},
+    v2::{CardMoveBuilder, CardMoveType, CardPeek},
 };
 
 use super::{
@@ -88,6 +88,74 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
 
     fn save_current_cursor_position(&mut self) -> Result<(), ()> {
         self.cursor.save_card_position()
+    }
+
+    // TODO: Move to GameEngine
+    fn attempt_automove(&mut self) -> Result<(), &str> {
+        if let (Some(selected_card_idx), Some(selected_pile_idx)) =
+            (self.cursor.card_index(), self.cursor.pile_index())
+        {
+            let available_moves = self.game_engine.get_available_moves();
+            if available_moves.is_empty() {
+                return Err("No ANY available moves");
+            }
+
+            let available_card_moves = available_moves
+                .iter()
+                .cloned()
+                .filter(|m| m.move_type() == CardMoveType::OnCardPile)
+                .filter(|m| m.src_pile() == selected_pile_idx)
+                .collect::<Vec<_>>();
+            if !available_card_moves.is_empty() {
+                let available_exact_card_moves = available_card_moves
+                    .iter()
+                    .cloned()
+                    .filter(|m| m.src_card() == selected_card_idx)
+                    .collect::<Vec<_>>();
+                if !available_exact_card_moves.is_empty() {
+                    // TODO: Calculate which exact move is better
+                    // - [x] Prefer same-suit moves
+                    // - [ ] Prefer smaller piles?
+                    let src_pile_suit = self.game_engine.get_pile_suit(selected_pile_idx);
+
+                    if let Some(same_suit_move) = available_exact_card_moves.iter().find(|m| {
+                        let dest_pile_suit = self.game_engine.get_pile_suit(m.dest_pile());
+
+                        dest_pile_suit == src_pile_suit
+                    }) {
+                        return match self.game_engine.perform_move(*same_suit_move) {
+                            Ok(_) => Ok(()),
+                            Err(_) => Err("Error performing same suit c2c automove"),
+                        };
+                    }
+
+                    let available_move = available_exact_card_moves.first().unwrap();
+
+                    return match self.game_engine.perform_move(*available_move) {
+                        Ok(_) => Ok(()),
+                        Err(_) => Err("Error performing c2c automove"),
+                    };
+                }
+            }
+
+            if let Some(empty_pile_move) = available_card_moves
+                .iter()
+                .cloned()
+                .filter(|m| m.move_type() == CardMoveType::OnEmptyPile)
+                .collect::<Vec<_>>()
+                // We're choosing first because it really doesn't matter
+                .first()
+            {
+                return match self.game_engine.perform_move(*empty_pile_move) {
+                    Ok(_) => Ok(()),
+                    Err(_) => Err("Error performing empty pile automove"),
+                };
+            }
+
+            return Err("No automoves");
+        }
+
+        todo!()
     }
 
     fn attempt_to_place_selected_card_to_current_cursor_position(&mut self) -> Result<(), ()> {
@@ -183,6 +251,8 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
             (_, KeyCode::Esc) => self.on_esc_pressed(),
             // [Restart the game]
             (_, KeyCode::Char('r')) => return Some(GameWindowKeyResult::RestartTheGame),
+            // [Automove]
+            (_, KeyCode::Char('t')) => self.on_automove_pressed(),
             // [Select a card / Select a pile]
             (_, KeyCode::Enter | KeyCode::Char(' ')) => self.on_action_pressed(),
             _ => {
@@ -216,6 +286,11 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
 
             self.cursor
                 .set_for_card_selection(self.calc_playable_card_lengths());
+        }
+    }
+    fn on_automove_pressed(&mut self) {
+        if self.is_selecting_a_card() {
+            let _ = self.attempt_automove();
         }
     }
     fn on_tab_pressed(&mut self) {
@@ -337,6 +412,10 @@ impl<CardStockT: ICardStock> GameWindow<CardStockT> {
                 }
             } else {
                 line.push_span(Span::from("| <`|p> – Peek"));
+            }
+
+            if self.is_selecting_a_card() {
+                line.push_span(Span::from(" | <t> - Automove"));
             }
 
             line
