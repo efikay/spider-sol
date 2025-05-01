@@ -1,5 +1,5 @@
 [package]
-name = "spider-sol"
+name = "spider_sol"
 version = "0.6.0"
 edition = "2024"
 
